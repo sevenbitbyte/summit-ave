@@ -1,12 +1,12 @@
-Summit Ave
+poc
 ===
 
-Summit Ave is a place for prototypes and experiments which over time may lead to stable features in production repositories.
+poc is a place for prototypes and experiments.
 
 
 [Streamline](streamline/README.md)
 ---
-Generic data visualizer prototype
+Location data visualizer prototype
 
 
 [ArcAsciiToImage](ArcAsciiToImage/README.md)
