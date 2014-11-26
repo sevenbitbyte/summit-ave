@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+
+    <title>spectrum</title>
+
+    <script src="jquery-2.1.0.min.js"></script>
+    <script src="RunningStats.js"></script>
+    <script src="tinycolor.js"></script>
+  </head>
+
+  <body>
+    <div>
+    <h1>spectrum</h1>
+
+    <h2>Audio Controls</h2>
+    <input type="file" id="audio-file" accept="audio/*" onchange="playFromFile();">
+    <button id='audio-play-button'>Play song</button>
+    <button id='audio-stop-button'>Stop</button>
+    <button id='audio-mic-button'>Use Mic</button>
+    <div id='aud_debug'></div>
+    <br>
+
+    <h3>Beat detection</h3>
+    <canvas id='beat' width="50" height="50"></canvas> <br>
+
+    <h3>Equalizer</h3>
+    <canvas id="eq" width=1024 height=512 ></canvas><br>
+
+    <h3>FFT</h3>
+    <canvas id='fft_spectrum' width="1024" height="768"></canvas>
+
+    <!-- NOTE: Check out how different these two songs appear, comment one uncomment the other -->
+    <audio id="aud" src="./MidnightCity.mp3"></audio>
+    <!-- <audio id="aud" src="./GiselleSilk.mp3"></audio> -->
+  </div>
+
+
+    <script>
+
+      var audioPlayButton =  $('button#audio-play-button')[0];
+      var audioStopButton =  $('button#audio-stop-button')[0];
+      var audioMicButton =  $('button#audio-mic-button')[0];
+      var pixelmapButton =  $('button#pixelmap-button')[0];
+      var audioElem = document.querySelector('audio');
+      var audioDebugElem = document.getElementById('aud_debug');
+      var fftElem = $('canvas#fft_spectrum')[0];
+      var fftCtx = fftElem.getContext("2d");
+
+      var eqElem = $('canvas#eq')[0];
+      var eqCtx = eqElem.getContext("2d");
+
+      var beatElem = $('canvas#beat')[0];
+      var beatCtx = beatElem.getContext("2d");
+
+      // Create AudioContext and buffer source
+      var audioCtx = new AudioContext();
+      var source = audioCtx.createMediaElementSource(audioElem);
+
+      var micSource = undefined;
+      var fileSource = undefined;
+
+
+      audioMicButton.onclick = function() {
+        console.log("Mic selected");
+
+        navigator.webkitGetUserMedia( {audio:true}, function(stream){
+          console.log("Got stream");
+          micSource = audioCtx.createMediaStreamSource( stream );
+          micSource.connect(scriptNode);
+          micSource.connect(audioCtx.destination);
+          scriptNode.connect(audioCtx.destination)
+          micSource.connect(analyser);
+
+          audioElem.play()
+        }, function(err){
+          console.log(err);
+        });
+
+      }
+
+
+
+      var playFromFile = function(){
+          var reader = new FileReader();
+
+          reader.onloadend = function () {
+
+            console.log((reader.result.length/1024)/1024);
+
+            audioCtx.decodeAudioData(reader.result, function(buffer) {
+              fileSource = audioCtx.createBufferSource();
+              fileSource.buffer = buffer;
+
+              scriptNode.connect(audioCtx.destination);
+
+              fileSource.connect(scriptNode);
+              fileSource.connect(audioCtx.destination);
+              fileSource.connect(analyser)
+              fileSource.start()
+            }, function(err){
+              console.log("Decode ERROR: " + err);
+            });
+          }
+
+          reader.readAsArrayBuffer($('#audio-file')[0].files[0]);
+      }
+
+
+
+      // Create a ScriptProcessorNode with a bufferSize of 4096 and a single input and output channel
+      var scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
+      console.log(scriptNode.bufferSize);
+
+      var analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;  //NOTE: Tweak this to change FFT resolution
+
+      var timeByteData = new Uint8Array(analyser.fftSize);
+      var timeDomainGlobalMax = 0;
+
+      var freqByteData = new Uint8Array(analyser.frequencyBinCount);
+      var freqByteData = new Uint8Array(analyser.frequencyBinCount);
+      var freqDeltaData = new Uint8Array(analyser.frequencyBinCount);
+      var freqStats = new RunningStats({
+        size : analyser.frequencyBinCount,
+        stddev : true,
+        type : Uint8Array
+      });
+
+      var energyStats = new RunningStats({
+        size : 1,
+        stddev : true,
+        type : Int32Array,
+        median : 20
+      });
+
+      var prevTotalEnergy = 0;
+
+
+      var start_time = undefined;
+      var last_report_delta = 0;
+      var call_count = 0;
+
+
+
+      // Give the node a function to process audio events
+      scriptNode.onaudioprocess = function(audioProcessingEvent) {
+        call_count++;
+        var now = (new Date()).getTime();
+        if(start_time === undefined){
+          start_time = now;
+        }
+
+        var deltaMs = now - start_time;
+        var deltaSec = Math.round(deltaMs/1000);
+
+        if(deltaSec != last_report_delta){
+          last_report_delta = deltaSec;
+          console.log((deltaMs/call_count));
+          //console.log(audioProcessingEvent)
+        }
+
+        // The input buffer is the song we loaded earlier
+        var inputBuffer = audioProcessingEvent.inputBuffer;
+
+        // The output buffer contains the samples that will be modified and played
+        var outputBuffer = audioProcessingEvent.outputBuffer;
+
+
+        analyser.getByteFrequencyData(freqByteData);
+
+        //Shit fft down
+        var imageData = fftCtx.getImageData(0, 0, fftCtx.canvas.width, fftCtx.canvas.height-2);
+        fftCtx.putImageData(imageData, 0, 2);
+
+        var totalEnergy = 0;
+
+        analyser.getByteTimeDomainData(timeByteData);
+
+        var startIdx=0;
+        var stopIdx = Math.round(timeByteData.length/2) + startIdx;
+
+        var timeDomainMax = 0;
+        for(i=0; i<timeByteData.length; i++){
+            timeDomainMax = Math.max(timeDomainMax, timeByteData[i]);
+        }
+
+
+        eqCtx.fillStyle = 'rgb(0,0,0)';
+        eqCtx.fillRect(0, 0, eqCtx.canvas.width, eqCtx.canvas.height);
+
+        var freqDomainMax = 0;
+        var freqDomainMaxSq = 0;
+        var freqDomainMaxIdx = 0;
+        for(i=0; i<freqByteData.length; i++){
+            //freqDomainMax = Math.max(freqDomainMax, );
+            var value = freqByteData[i];
+
+            if(freqDomainMax < value){
+              freqDomainMax = value;
+              freqDomainMaxSq = value * value;
+              freqDomainMaxIdx = i;
+            }
+        }
+
+        var eqBarWidth = eqCtx.canvas.width / (freqByteData.length/2);
+        for(i=0; i<freqByteData.length/2; i++){
+          var value = freqByteData[i]/freqDomainMax
+          var valueSq = (freqByteData[i]*freqByteData[i])/freqDomainMaxSq;
+          var c = new tinycolor('hsv(' + (((valueSq*0.75)+0.1)*360) + ',' + (0+(100*(value))) + ',' + (50+(50*value)) + ')');
+          var rgb = c.toRgb();
+          eqCtx.fillStyle = 'rgb(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ')';
+
+          var y = value * eqCtx.canvas.height;
+          eqCtx.fillRect(i*eqBarWidth, eqCtx.canvas.height - y, eqBarWidth, value * eqCtx.canvas.height);
+        }
+
+        var freqDomainPercent = freqDomainMaxIdx / freqByteData.length;
+
+        for(i=0; i<timeByteData.length; i++){
+          var db = timeByteData[i]/timeDomainMax
+          totalEnergy += db * db;
+        }
+
+        totalEnergy = Math.max(timeDomainMax - prevTotalEnergy, 0) / timeDomainGlobalMax
+
+        if(timeDomainMax < timeDomainGlobalMax){
+          timeDomainGlobalMax = timeDomainGlobalMax
+        }
+        else{
+          timeDomainGlobalMax = timeDomainMax
+        }
+
+        prevTotalEnergy = totalEnergy
+
+
+        //Draw beat detector1
+        var intensity = Math.max(0, totalEnergy * (100));
+
+        if(totalEnergy < 0.5 || totalEnergy===totalEnergy/0 ){
+          intensity = 0;
+          var c = new tinycolor('hsv(' + (intensity/100)*360 + ',' + intensity + ',' + intensity + ')').toRgb();
+          beatCtx.fillStyle = 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')';
+          beatCtx.fillRect(0, 0, 50, 50);
+        }
+        else if(totalEnergy > 0.50 ){
+          var percent=(totalEnergy-0.5)*2
+          var c = new tinycolor('hsv(' + (percent)*360 + ',' + 100 + ',' + 100 + ')');
+          var rgb = c.toRgb();
+          beatCtx.fillStyle = 'rgb(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ')';
+          beatCtx.fillRect(0, 0, 50, 50);
+        }
+
+
+
+
+        var fftBarWidth = fftElem.width / (freqByteData.length/2);
+
+
+        for(i=0; i<freqByteData.length/2; i++){
+          var val = (freqByteData[i]/freqDomainMax) * 255;
+
+
+          var intensity = val;
+
+          var c = new tinycolor('hsv(' + ((val/255)*360) + ',' + intensity + ',' + intensity + ')').toRgb();
+
+          fftCtx.fillStyle = 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')';
+          fftCtx.fillRect(i*fftBarWidth, 0, fftBarWidth, 2);
+        }
+      }
+
+
+      // wire up play button
+      audioPlayButton.onclick = function() {
+        source.connect(scriptNode);
+        source.connect(audioCtx.destination);
+        scriptNode.connect(audioCtx.destination)
+        source.connect(analyser);
+
+        audioElem.play()
+      }
+
+      // wire up play button
+      audioStopButton.onclick = function() {
+        stopPlayback()
+      }
+
+
+      var stopPlayback = function() {
+        source.disconnect(scriptNode);
+        source.disconnect(audioCtx.destination);
+        scriptNode.disconnect(audioCtx.destination)
+        source.disconnect(analyser);
+        audioElem.pause();
+      }
+
+      audioElem.addEventListener('all', function(event_name){
+        console.log(event_name);
+      })
+
+      audioElem.addEventListener("ended", function(){
+          stopPlayback();
+          audioElem.currentTime = 0;
+     });
+
+    </script>
+
+</body></html>

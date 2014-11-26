@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>945</width>
+    <height>584</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="mainGridLayout"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>945</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_GPX"/>
+    <addaction name="actionOpen_Directory"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <widget class="QMenu" name="menuGoto_City">
+     <property name="title">
+      <string>Goto City</string>
+     </property>
+     <addaction name="actionGotoChicago"/>
+     <addaction name="actionGotoPortland"/>
+     <addaction name="actionGotoRichmond"/>
+     <addaction name="actionGotoRochester"/>
+     <addaction name="actionGotoSan_Francisco"/>
+     <addaction name="actionGotoSan_Jose"/>
+     <addaction name="actionGotoSeattle"/>
+     <addaction name="actionGotoWashington_DC"/>
+    </widget>
+    <widget class="QMenu" name="menuSelection_Indicator">
+     <property name="title">
+      <string>Selection Indicator </string>
+     </property>
+     <property name="separatorsCollapsible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionElevation"/>
+     <addaction name="actionSaturation"/>
+     <addaction name="actionMeta"/>
+     <addaction name="actionTracing"/>
+     <addaction name="actionTiered"/>
+     <addaction name="separator"/>
+     <addaction name="actionChange_Cutoff"/>
+     <addaction name="actionCutoff_as_percent_of_view_range"/>
+    </widget>
+    <addaction name="menuGoto_City"/>
+    <addaction name="actionGoto"/>
+    <addaction name="menuSelection_Indicator"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
+  </widget>
+  <action name="actionOpen_GPX">
+   <property name="text">
+    <string>Open GPX</string>
+   </property>
+  </action>
+  <action name="actionOpen_Directory">
+   <property name="text">
+    <string>Open Directory</string>
+   </property>
+  </action>
+  <action name="actionGotoSeattle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Seattle</string>
+   </property>
+  </action>
+  <action name="actionGotoSan_Francisco">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>San Francisco</string>
+   </property>
+  </action>
+  <action name="actionGotoSan_Jose">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>San Jose</string>
+   </property>
+  </action>
+  <action name="actionGotoRochester">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Rochester</string>
+   </property>
+  </action>
+  <action name="actionGotoRichmond">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Richmond</string>
+   </property>
+  </action>
+  <action name="actionGoto">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Goto...</string>
+   </property>
+  </action>
+  <action name="actionGotoChicago">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Chicago</string>
+   </property>
+  </action>
+  <action name="actionGotoWashington_DC">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Washington. DC</string>
+   </property>
+  </action>
+  <action name="actionGotoPortland">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Portland</string>
+   </property>
+  </action>
+  <action name="actionElevation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Elevation</string>
+   </property>
+  </action>
+  <action name="actionSaturation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Saturation</string>
+   </property>
+  </action>
+  <action name="actionMeta">
+   <property name="text">
+    <string>Meta</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionTracing">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tracing</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionTiered">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Time Cutoff</string>
+   </property>
+  </action>
+  <action name="actionChange_Cutoff">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Change Cutoff</string>
+   </property>
+  </action>
+  <action name="actionCutoff_as_percent_of_view_range">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>As % of active range</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionTiered</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>actionChange_Cutoff</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionTiered</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>actionCutoff_as_percent_of_view_range</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
