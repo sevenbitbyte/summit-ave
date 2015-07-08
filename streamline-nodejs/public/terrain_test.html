@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>streamline - location_parser</title>
+      <!--<link rel='stylesheet' href='/css/style.css'/> -->
+      <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+
+    <style>
+      body {
+        color: #cccccc;
+        font-family:Monospace;
+        font-size:13px;
+        text-align:center;
+
+        background-color: #000000;
+        margin: 0px;
+        overflow: hidden;
+      }
+
+      #info {
+        position: absolute;
+        top: 0px; width: 100%;
+        padding: 5px;
+      }
+
+      a {
+
+        color: #0080ff;
+      }
+
+    </style>
+
+    <script src="js/jquery-2.1.0.js"></script>
+    <script src="js/jquery.xml2json.js"></script>
+    <script src="http://threejs.org/build/three.js"></script>
+    <script src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <!--<script src="js/libs/FirstPersonControls.js"></script>-->
+    <!--<script src="js/libs/OrbitControls.js"></script>-->
+    <script src="js/libs/THREEx.KeyboardState.js"></script>
+    <script src="js/libs/THREEx.FullScreen.js"></script>
+    <script src="js/libs/THREEx.WindowResize.js"></script>
+    <script src="js/libs/moment.js"></script>
+    <script src="js/libs/SortedList.js"></script>
+    <script src="js/libs/IntervalTree.js"></script>
+
+    <script src="js/Detector.js"></script>
+    <script src="js/libs/stats.min.js"></script>
+    <script src="js/nimbus.js"></script>
+    <script src="js/filereader.js"></script>
+    <script src="js/cumulo/common/histogram.js"></script>
+    <script src="js/cumulo/location.js"></script>
+    <script src="js/cumulo/ui-location.js"></script>
+  </head>
+  <body>
+
+
+
+    <div id="container">
+
+<div id="info">
+    <input type="date" name="activeDate" id="activeDate" class="activeDate"> <br>
+    <img id='img-preview' width=100 height=100>
+    Upload: <input type='file' multiple="multiple" id='fileUploader'>
+</div>
+
+
+</div>
+
+ 	<script id="oceanSurfaceVert" type="x-shader/x-vertex">
+
+			varying vec3 v_objCoor;
+
+			void main()	{
+
+				v_objCoor = position;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+		</script>
+
+		<script id="oceanSurfaceFrag" type="x-shader/x-fragment">
+			uniform vec3 u_color;
+			varying vec3 v_objCoor;
+
+			float remap (float value, float initStart, float initEnd, float finalStart, float finalEnd)
+			{
+				float mapped = (( (value - initStart) *(finalEnd - finalStart) ) / (initEnd- initStart)) + finalStart;
+				return mapped;
+			}
+
+			void main()	{
+				vec3 cameraPos = vec3(-338.0, -48.0, 2000.0);
+				float border = -100.0;
+
+				float alpha = remap(v_objCoor.y+border, 0.0, cameraPos.z*3.0, 0.0, 1.0);
+				float red = remap(v_objCoor.z, -500.0, 500.0, 0.8, 1.0);
+				float green = remap(v_objCoor.z, -500.0, 500.0, 0.8, 1.0);
+
+				gl_FragColor=vec4(red, green,248.0/256.0, alpha);
+
+
+			}
+		</script>
+
+
+    <script>
+
+      if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+      var container, stats;
+
+      var camera, scene, renderer, controls, keyboard;
+
+
+      var gaze = new THREE.Vector3(0, 0, 0);
+
+      var mesh;
+
+      var target;
+      var location_data;
+      var loc_center;
+      var gpx_collection = new Location.GpxCollection();
+
+      var imgData = undefined;
+      var imgCanvas = document.createElement("canvas");
+      var imgPreview = $('#img-preview');
+
+
+      $( document ).ready(function() {
+        var opts = {
+          readAsDefault: "Text",
+          on: {
+            load: function(e, file) {
+              console.log("Read: " + file.name);
+              uploadGpx(file, e.target.result);
+            }
+          }
+        };
+        $("#fileUploader").fileReaderJS(opts);
+
+
+        $('#activeDate').change(
+          function(){
+            var dateString = $('#activeDate').val();
+            var date = new Date(dateString);
+
+            dateStr = date.toISOString();
+            dateStr = dateStr.substr( 0, dateStr.indexOf('T') );
+            dateStr = dateStr.replace('-', '');
+            dateStr = dateStr.replace('-', '');
+
+            console.log(dateStr);
+            var request = {
+                    owner: "sevenbit",
+                      target: "location/gpx",
+                      action: "READ",
+                      params: {
+                        originObj: dateStr,
+                        //fields: ["time", "lat", "lon", "speed", "ele"],
+                        //stats: ["max", "min"]
+                      }
+                      };
+
+            var val = nimbus.call(request, renderGpxResponse);
+          }
+        );
+
+        //$('#activeDate').val("2014-03-24").change();
+
+if(scene === undefined){
+          var image = new Image();
+          image.onload = function(){ // always fires the event.
+              console.log('loaded');
+
+
+            imgCanvas.width = image.width;
+            imgCanvas.height = image.height;
+            imgCanvas.getContext("2d").drawImage(image, 0, 0);
+
+            imgData = imgCanvas.getContext("2d").getImageData(0, 0, imgCanvas.width, imgCanvas.height).data;
+
+            init();
+            //addGpxToScene(gpx);
+          };
+          // handle failure
+          image.onerror = function(){
+
+          };
+
+          console.log('TerrainTile');
+
+          //image.src = '/terrain/tile/elev/46.1992327,-122.1824242.png';     // St. Helens
+          //image.src = '/terrain/tile/elev/47.6376975,-122.3276025.png';   // Lake Union
+          //image.src = '/terrain/tile/elev/48.0578295,-121.7967002.png';   // Mt. Pilchuck
+          image.src = '/terrain/tile/elev/47.5077377,-121.7398391.png';   // Mt.Si
+          //image.src = '/terrain/tile/elev/48.0107411,-121.3432104.png';   // Goat lake
+          imgPreview.attr("src", image.src);
+          //return;
+        }
+      });
+
+
+      function renderGpxResponse(gpxJson){
+        console.log(gpxJson.res.data);
+
+        if(gpxJson.res.data.gpx === undefined){
+          console.log('ERROR: Failed to retrieve location data');
+          return;
+        }
+
+        var gpx = new Location.Gpx(gpxJson.res.data.gpx);
+        gpx_collection.addGpx(gpx);
+        addGpxToScene(gpx);
+      }
+
+      function uploadGpx(file, data){
+        fileJson = $.xml2json($.parseXML(data));
+        var request = {
+                owner: "sevenbit",
+                  target: "location/gpx",
+                  action: "WRITE",
+                  params: {
+                    originObj: 'user@host/path',
+                    format: 'gpx'
+                  },
+                  data : fileJson
+                };
+
+        console.log(request);
+
+        var gpx = new Location.Gpx(fileJson);
+        gpx_collection.addGpx(gpx);
+        addGpxToScene(gpx);
+
+
+        console.log('gpx...');
+        console.log(gpx);
+
+        var val = nimbus.call(request, uploadCallback);
+      }
+
+      function uploadCallback(result){
+        console.log("Upload complete");
+        console.log(result);
+      }
+
+      function drawDate(month, day, year) {
+
+        var dateStr = "" + year + "" + month + "" + day;
+        var request = {
+                owner: "sevenbit",
+                  target: "location/points",
+                  action: "READ",
+                  params: {
+                    originObj: dateStr,
+                    fields: ["time", "lat", "lon", "speed", "ele"],
+                    stats: ["max", "min"]
+                  }
+                  };
+
+        var val = nimbus.call(request, init);
+      }
+
+      var tileCount = 0;
+      function addGpxToScene(gpx){
+        if(scene === undefined){
+          var image = new Image();
+          image.onload = function(){ // always fires the event.
+              console.log('loaded');
+
+
+            imgCanvas.width = image.width;
+            imgCanvas.height = image.height;
+            imgCanvas.getContext("2d").drawImage(image, 0, 0);
+
+            imgData = imgCanvas.getContext("2d").getImageData(0, 0, imgCanvas.width, imgCanvas.height).data;
+
+            init();
+            addGpxToScene(gpx);
+          };
+          // handle failure
+          image.onerror = function(){
+
+          };
+
+          console.log('TerrainTile');
+          console.log(gpx);
+
+          image.src = '/terrain/46.1992327,-122.1824242.png';  //St. Helens
+          //image.src = '/terrain/47.6376975,-122.3276025.png';  //Lake Union
+          //image.src = '/terrain/48.0578295,-121.7967002.png';    //Mt. Pilchuck
+          //image.src = '/terrain/47.5077377,-121.7398391.png';      // Mt.Si
+          //image.src = '/terrain/48.0107411,-121.3432104.png';     // Goat lake
+          imgPreview.attr("src", image.src);
+          return;
+        }
+
+        console.log("Segments: " + gpx.segments.length);
+        console.log('Constructing meshes...');
+        mesh = new Location.Ui.GpxThumb({});
+        mesh.group.translateX(tileCount*10 );
+        mesh.addGpx(gpx);
+        console.log(mesh);
+
+        scene.add( mesh.group );
+
+        //camera.translateY(tileCount*10);
+        //camera.lookAt(mesh.group.position);
+
+        tileCount++;
+
+
+        //render();
+      }
+
+      function init() {
+
+        container = document.getElementById( 'container' );
+
+        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, .1, 4000 );
+        camera.position.set( 0, 20, 0 );
+
+        var axisHelper = new THREE.AxisHelper( 0.05 );
+        axisHelper.translateX(-0.411 * (window.innerWidth / window.innerHeight));
+        axisHelper.translateY(-0.41);
+        axisHelper.translateZ(-1);
+        axisHelper.geometry.computeBoundingBox();
+
+        camera.add(axisHelper);
+
+        //camera.rotateOnAxis( new THREE.Vector3(0,1,0), Math.PI * 0.5);
+
+        scene = new THREE.Scene();
+
+
+        scene.add(camera);
+
+        //console.log(scene);
+        //console.log(camera);
+
+        //target = new THREE.Vector3(camera.position.x, camera.position.y, 0);
+
+        //camera.lookAt(target);
+
+        //camera.up = new THREE.Vector3(0, 1, 0);
+
+        /*target = new THREE.Vector3(camera.position.x, camera.position.y, 0);
+
+        camera.lookAt(target);
+        camera.rotation.z = 0;*/
+
+        if(renderer !== undefined){
+
+          while (container.hasChildNodes()) {
+              container.removeChild(container.lastChild);
+          }
+        }
+
+        renderer = new THREE.WebGLRenderer( { antialias: false } );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        renderer.gammaInput = true;
+        renderer.gammaOutput = true;
+
+        container.appendChild( renderer.domElement );
+
+
+        THREEx.WindowResize(renderer, camera);
+        THREEx.FullScreen.bindKey({ charCode : 'f'.charCodeAt(0) });
+        controls = new THREE.OrbitControls( camera, renderer.domElement );
+        //controls = new THREE.FirstPersonControls( camera, renderer.domElement );
+        //controls.rotateSpeed = 1.0;
+        /*controls.zoomSpeed = 1.2;
+        controls.panSpeed = 0.8;
+        controls.noZoom = false;
+        controls.noPan = false;
+        controls.noRotate = false;
+        controls.staticMoving = false;
+        controls.dynamicDampingFactor = 0.3;*/
+
+
+
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        container.appendChild( stats.domElement );
+
+        keyboard	= new THREEx.KeyboardState();
+
+
+
+
+
+        oceanMeshMaterial = new THREE.MeshBasicMaterial( {
+          color: 0xcccccc,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.1
+        });
+
+        oceanMeshMaterial = new THREE.MeshBasicMaterial( { color: 0x72AB97, wireframe: true,
+        transparent: true,
+        opacity: 0.1
+       } );
+
+      	var blackMaterial = new THREE.MeshPhongMaterial( {
+  				color: 0x003925, ambient: 0x003925, specular: 0x010101, shininess: 0,
+  				side: THREE.DoubleSide, opacity: 0.2, transparent: false,
+          shading: THREE.FlatShading
+				});
+
+        //blackMaterial = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading, map: texture, transparent: true } )
+
+        /*blackMaterial = new THREE.MeshPhongMaterial( {
+            color: 0x996633,
+    ambient: 0x996633, // should generally match color
+    specular: 0x0a0a0a,
+             shininess: 14,
+              shading: THREE.FlatShading,
+            side: THREE.DoubleSide,  transparent: false
+          } );*/
+
+      	oceanUniforms = {
+      		u_color : { type: "c", value: new THREE.Color( 0x383a49 ) }
+      	};
+
+      	/*oceanMaterial = new THREE.ShaderMaterial( {
+
+      		uniforms: oceanUniforms,
+      		vertexShader: document.getElementById( 'oceanSurfaceVert' ).textContent,
+      		fragmentShader: document.getElementById( 'oceanSurfaceFrag' ).textContent
+
+      	} );
+
+      	oceanMaterial.wireframe = false;*/
+
+
+
+        var oceanWidth = 500;
+        var oceanLength = 500;
+        var oceanDivisions = imgCanvas.width;
+
+      	oceanPlane = new THREE.PlaneGeometry(oceanWidth, oceanLength, imgCanvas.width-1, imgCanvas.height-1);
+      	oceanPlane.doubleSided = true;
+      	oceanPlane.dynamic = true;
+      	oceanPlane.computeFaceNormals();
+      	oceanPlane.computeVertexNormals();
+
+        //var colors = new Float32Array( oceanPlane.vertices.length * 3 * 3 );
+
+
+        for ( var j = 0; j < oceanPlane.vertices.length; j ++ ) {
+        /*for(var row = 0; row < imgCanvas.height; row++){
+          var offset = Math.floor(imgCanvas.width * row) - row;
+
+          if((row == parseFloat(row)) && (row % 2 == 0)){
+            //Even
+            for(var j = 0; j < imgCanvas.width; j++){
+              oceanPlane.vertices[ offset + ( j) ].z = 10 - ((imgData[(offset+j) * 4] / 255) * 10);
+            }
+          }
+          else{
+            //Odd
+            for(var j = 0; j < imgCanvas.width; j++){
+              oceanPlane.vertices[ offset + j ].z = 10 - ((imgData[(offset+j) * 4] / 255) * 10);
+            }
+          }*/
+          //oceanPlane.vertices[  j ].z = 1 - ((imgData[(oceanPlane.vertices.length - j) * 4] / 255) * 1);
+          oceanPlane.vertices[  j ].z = 150 - ((imgData[j * 4] / 255) * 150);
+
+          /*var data = imgData[j*4];
+          if(data < 10){
+            colors[j*3] = 0;
+            colors[j*3+1] = 0;
+            colors[j*3+2] = data/10;
+          }*/
+      	}
+
+
+        //oceanPlane.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+
+      	ocean = new THREE.Mesh(oceanPlane, blackMaterial);
+      	ocean.name = name +"_ocean";
+      	ocean.rotation.x = Math.PI/2;
+      	ocean.doubleSided = true;
+        scene.add(ocean);
+
+
+        ocean2 = new THREE.Mesh(oceanPlane, oceanMeshMaterial);
+        ocean2.name = name +"_ocean2";
+        ocean2.rotation.x = Math.PI/2;
+        ocean2.doubleSided = true;
+        scene.add(ocean2);
+
+				scene.add( new THREE.AmbientLight( 0xD0ECBD ) );
+
+
+				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+        setTimeout(animate);
+      }
+
+      function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        render();
+        stats.update();
+      }
+
+      //
+
+      function animate() {
+
+        //setTimeout(animate, 50);
+        requestAnimationFrame( animate );
+
+        controls.update();
+
+        render();
+        stats.update();
+      }
+
+      function render() {
+        /*if(keyboard.pressed("A")){
+          camera.position.x-=1.5;
+          gaze.x-=1.5;
+          camera.up = camera.up;
+          camera.lookAt(gaze);
+        }
+
+        if(keyboard.pressed("D")){
+          camera.position.x+=1.5;
+          gaze.x+=1.5;
+          camera.up = camera.up;
+          camera.lookAt(gaze);
+        }*/
+
+
+        renderer.render( scene, camera );
+      }
+
+    </script>
+
+  </body>
+</html>

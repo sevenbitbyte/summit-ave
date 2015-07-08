@@ -1,0 +1,57 @@
+<html>
+	<head>
+		    <script src="js/jquery-2.1.0.js"></script>
+	</head>
+
+
+	<body>
+
+		<script>
+
+			var retVal;
+			var result;
+			var request = {
+							    owner: "sevenbit",
+							    target: "location/points",
+							    action: "READ",
+							    params: {
+							    	originObj: "20140324",
+							    	fields: ["time", "lat", "lon", "speed"]
+							    },
+							    data: {},
+							};
+
+			var nimbus = {};
+
+			nimbus.call = 
+				function(request, complete){
+					request.tx_timestamp = (new Date()).getTime();
+
+					return $.ajax({ 
+			            type: "POST",
+			            dataType: "json",
+			            data: request,
+			            url: "http://localhost:3000/nimbus",
+			            success: function(data){
+			               result=data;
+			               result.req.rx_timestamp = (new Date()).getTime();
+			               result.req.latency = result.req.rx_timestamp - result.req.tx_timestamp;
+			               console.log("Total latency = " + result.req.latency + "ms");
+			               console.log("Compute time = " + result.latency + "ms");
+			               console.log("Network time = " + (result.req.latency - result.latency) + "ms");
+			               if(complete !== undefined){
+			               	complete();
+			               }
+			            }
+		        	});
+				}
+
+			$( document ).ready(function() {
+				retVal = nimbus.call(request, function(){console.log("Done");});
+			});
+
+		</script>
+
+	</body>
+
+</html>

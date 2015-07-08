@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+  	<head>
+    	<title>streamline - location_scrapper</title>
+    	<!--<link rel='stylesheet' href='/css/style.css'/> -->
+    	<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+		<style>
+			body {
+				color: #cccccc;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+		</style>
+
+		<script src="js/jquery-2.1.0.js"></script>
+		<script src="js/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/nimbus.js"></script>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<h1><%= title %></h1>
+    		<p>Welcome to <%= title %></p>
+    		<br>
+
+    		<input type="date" name="activeDate" id="activeDate" class="activeDate">
+		</div>
+
+
+
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh;
+
+			var target;
+			var location_data;
+			var loc_center;
+
+			//var timeout
+
+
+			$( document ).ready(function() {
+
+
+
+				$('#activeDate').change(
+					function(){
+						var dateString = $('#activeDate').val();
+						var date = new Date(dateString);
+
+						dateStr = date.toISOString();
+						dateStr = dateStr.substr( 0, dateStr.indexOf('T') );
+						dateStr = dateStr.replace('-', '');
+						dateStr = dateStr.replace('-', '');
+
+						console.log(dateStr);
+						var request = {
+										owner: "sevenbit",
+									    target: "location/points",
+									    action: "READ",
+									    params: {
+									    	originObj: dateStr,
+									    	fields: ["time", "lat", "lon", "speed", "ele"],
+									    	stats: ["max", "min"]
+									    }
+								  	  };
+
+						var val = nimbus.call(request, init);
+					}
+				);
+
+				$('#activeDate').val("2014-03-24").change();
+			});
+
+			function drawDate(month, day, year) {
+
+				var dateStr = "" + year + "" + month + "" + day;
+				var request = {
+								owner: "sevenbit",
+							    target: "location/points",
+							    action: "READ",
+							    params: {
+							    	originObj: dateStr,
+							    	fields: ["time", "lat", "lon", "speed", "ele"],
+							    	stats: ["max", "min"]
+							    }
+						  	  };
+
+				var val = nimbus.call(request, init);
+			}
+
+			function init(result) {
+
+				container = document.getElementById( 'container' );
+
+				location_data = result;
+
+				if(location_data.res.err !== undefined){
+					return false;
+				}
+
+				var loc_stats  = location_data.res.data.stats;
+				var loc_segments = location_data.res.data.points;
+
+
+				console.log("Segments: " + loc_segments.length);
+
+				camera = new THREE.PerspectiveCamera( 5, window.innerWidth / window.innerHeight, 0.00000001, 400 );
+
+				loc_center = undefined;
+
+				scene = new THREE.Scene();
+
+
+				for(segIdx in loc_segments) {
+					var segPoints = loc_segments[segIdx];
+					var segStats = loc_stats[segIdx];
+
+					var points = loc_segments[segIdx].lat.length;
+
+					console.log("Drawing: " + points + "points");
+
+					if(loc_center == undefined){
+						loc_center = new THREE.Vector3(
+												(segStats.lon.max + segStats.lon.min) / 2.0,
+												(segStats.lat.max + segStats.lat.min) / 2.0,
+												0
+											);
+					}
+					else{
+						lon_center = (segStats.lon.max + segStats.lon.min) / 2.0,
+						lat_center = (segStats.lat.max + segStats.lat.min) / 2.0,
+
+						loc_center.setX((loc_center.x + lon_center) / 2);
+						loc_center.setY((loc_center.y + lat_center) / 2);
+					}
+
+
+					//camera.position.x = (location_data.res.data.stats[1].lon.max + location_data.res.data.stats[1].lon.min) / 2.0;
+					//camera.position.y = (location_data.res.data.stats[1].lat.max + location_data.res.data.stats[1].lat.min) / 2.0;
+
+
+					var geometry = new THREE.BufferGeometry();
+					var material = new THREE.LineBasicMaterial({ vertexColors: true });
+
+					geometry.addAttribute( 'position', new Float32Array( points * 3 ), 3 );
+					geometry.addAttribute( 'color', new Float32Array( points * 3 ), 3 );
+
+					var positions = geometry.getAttribute( 'position' ).array;
+					var colors = geometry.getAttribute( 'color' ).array;
+
+					for(var i=0; i < points; i++){
+						var x = segPoints.lon[i];
+						var y = segPoints.lat[i];
+						var z = 0;
+						//var z = location_data.res.data.points[1].ele[i];
+
+						//console.log(x+","+y+","+z);
+
+						positions[ i * 3 ] = x;
+						positions[ i * 3 + 1 ] = y;
+						positions[ i * 3 + 2 ] = z;
+
+						//var vel = location_data.res.data.points[1].speed[i] - location_data.res.data.stats[1].speed.min;
+						//vel = vel / location_data.res.data.stats[1].speed.max;
+
+						var speed = segPoints.speed[i] / 10.0;
+
+						speed = 1 - (Math.min(speed, 1.0) * 0.8);
+
+						var col = (new THREE.Color).setHSL( speed, speed, 0.6 );
+
+						colors[ i * 3 ] = col.r;
+						colors[ i * 3 + 1 ] = col.g;
+						colors[ i * 3 + 2 ] = col.b;
+
+					}
+
+
+					geometry.computeBoundingSphere();
+
+					mesh = new THREE.Line( geometry, material );
+					scene.add( mesh );
+				}
+
+				camera.position.x = loc_center.x;
+				camera.position.y = loc_center.y;
+				camera.position.z = 3;
+
+				camera.up = new THREE.Vector3(0, 0, 1);
+
+				target = new THREE.Vector3(camera.position.x, camera.position.y, 0);
+
+				camera.lookAt(loc_center);
+				camera.rotation.z = 0;
+
+				if(renderer !== undefined){
+
+					while (container.hasChildNodes()) {
+					    container.removeChild(container.lastChild);
+					}
+				}
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				render();
+				stats.update();
+				//setTimeout(animate);
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+				stats.update();
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var time = Date.now();
+
+				var percent = (time % 15000)/15000;
+
+
+				//camera.rotation.z = time * 0.25;
+
+				/*camera.up = new THREE.Vector3(0, 0, 1);
+				camera.position.x = loc_center.x + 2*Math.sin(percent * 2* Math.PI);
+				camera.position.y = loc_center.y + 2*Math.cos(percent * 2* Math.PI);
+				camera.position.z = 3;
+
+
+				camera.lookAt(loc_center);*/
+
+				//camera.rotation.z = 0;
+
+				//mesh.rotation.z = time * 0.25;
+				//mesh.rotation.y = time * 0.5;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

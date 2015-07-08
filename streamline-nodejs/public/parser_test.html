@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  	<head>
+    	<title>streamline - location_parser</title>
+    	<!--<link rel='stylesheet' href='/css/style.css'/> -->
+    	<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+
+		<style>
+			body {
+				color: #cccccc;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+        padding:0;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+		</style>
+
+		<script src="js/jquery-2.1.0.js"></script>
+    <script src="js/jquery.xml2json.js"></script>
+    <script src="js/libs/jquery.touchy.js"></script>
+    <script src="js/libs/reddit.js"></script>
+
+
+		<script src="http://threejs.org/build/three.js"></script>
+    <script src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <!--<script src="js/libs/FirstPersonControls.js"></script>-->
+    <!--<script src="js/libs/OrbitControls.js"></script>-->
+    <script src="js/libs/THREEx.KeyboardState.js"></script>
+    <script src="js/libs/THREEx.FullScreen.js"></script>
+    <script src="js/libs/THREEx.WindowResize.js"></script>
+
+    <script src="js/libs/binarysearch.js"></script>
+    <script src="js/libs/moment.js"></script>
+    <script src="js/libs/twix.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-range/1.0.5/moment-range.js"></script>-->
+    <script src="js/libs/SortedList.js"></script>
+    <script src="js/libs/IntervalTree.js"></script>
+    <script src="js/libs/QuadTree.js"></script>
+
+    <script src="js/libs/lru.js"></script>
+
+    <script src="js/Detector.js"></script>
+    <script src="js/libs/stats.min.js"></script>
+		<script src="js/nimbus.js"></script>
+    <script src="js/filereader.js"></script>
+    <script src="js/cumulo/common/histogram.js"></script>
+    <script src="js/cumulo/ui-timeline.js"></script>
+    <script src="js/cumulo/terrain.js"></script>
+    <script src="js/cumulo/ui-terrain.js"></script>
+    <script src="js/cumulo/location.js"></script>
+    <script src="js/cumulo/ui-location.js"></script>
+
+    <script src="js/app/parser_test.js"></script>
+	</head>
+	<body>
+
+    <div id="container" width=100% height=100%>
+
+      <canvas id="timeline" style="position:fixed; width:1920px; height:64px; padding:0px; bottom:0px;" width=3840 height=128>
+      </canvas>
+
+      <div id="info">
+          <input type="date" name="activeDate" id="activeDate" class="activeDate"> <br>
+          Upload: <input type='file' multiple="multiple" id='fileUploader'>
+      </div>
+
+    </div>
+
+
+	</body>
+</html>
