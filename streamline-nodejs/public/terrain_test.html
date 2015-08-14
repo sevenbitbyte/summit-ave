@@ -129,142 +129,7 @@
 
 
       $( document ).ready(function() {
-        var opts = {
-          readAsDefault: "Text",
-          on: {
-            load: function(e, file) {
-              console.log("Read: " + file.name);
-              uploadGpx(file, e.target.result);
-            }
-          }
-        };
-        $("#fileUploader").fileReaderJS(opts);
 
-
-        $('#activeDate').change(
-          function(){
-            var dateString = $('#activeDate').val();
-            var date = new Date(dateString);
-
-            dateStr = date.toISOString();
-            dateStr = dateStr.substr( 0, dateStr.indexOf('T') );
-            dateStr = dateStr.replace('-', '');
-            dateStr = dateStr.replace('-', '');
-
-            console.log(dateStr);
-            var request = {
-                    owner: "sevenbit",
-                      target: "location/gpx",
-                      action: "READ",
-                      params: {
-                        originObj: dateStr,
-                        //fields: ["time", "lat", "lon", "speed", "ele"],
-                        //stats: ["max", "min"]
-                      }
-                      };
-
-            var val = nimbus.call(request, renderGpxResponse);
-          }
-        );
-
-        //$('#activeDate').val("2014-03-24").change();
-
-if(scene === undefined){
-          var image = new Image();
-          image.onload = function(){ // always fires the event.
-              console.log('loaded');
-
-
-            imgCanvas.width = image.width;
-            imgCanvas.height = image.height;
-            imgCanvas.getContext("2d").drawImage(image, 0, 0);
-
-            imgData = imgCanvas.getContext("2d").getImageData(0, 0, imgCanvas.width, imgCanvas.height).data;
-
-            init();
-            //addGpxToScene(gpx);
-          };
-          // handle failure
-          image.onerror = function(){
-
-          };
-
-          console.log('TerrainTile');
-
-          //image.src = '/terrain/tile/elev/46.1992327,-122.1824242.png';     // St. Helens
-          //image.src = '/terrain/tile/elev/47.6376975,-122.3276025.png';   // Lake Union
-          //image.src = '/terrain/tile/elev/48.0578295,-121.7967002.png';   // Mt. Pilchuck
-          image.src = '/terrain/tile/elev/47.5077377,-121.7398391.png';   // Mt.Si
-          //image.src = '/terrain/tile/elev/48.0107411,-121.3432104.png';   // Goat lake
-          imgPreview.attr("src", image.src);
-          //return;
-        }
-      });
-
-
-      function renderGpxResponse(gpxJson){
-        console.log(gpxJson.res.data);
-
-        if(gpxJson.res.data.gpx === undefined){
-          console.log('ERROR: Failed to retrieve location data');
-          return;
-        }
-
-        var gpx = new Location.Gpx(gpxJson.res.data.gpx);
-        gpx_collection.addGpx(gpx);
-        addGpxToScene(gpx);
-      }
-
-      function uploadGpx(file, data){
-        fileJson = $.xml2json($.parseXML(data));
-        var request = {
-                owner: "sevenbit",
-                  target: "location/gpx",
-                  action: "WRITE",
-                  params: {
-                    originObj: 'user@host/path',
-                    format: 'gpx'
-                  },
-                  data : fileJson
-                };
-
-        console.log(request);
-
-        var gpx = new Location.Gpx(fileJson);
-        gpx_collection.addGpx(gpx);
-        addGpxToScene(gpx);
-
-
-        console.log('gpx...');
-        console.log(gpx);
-
-        var val = nimbus.call(request, uploadCallback);
-      }
-
-      function uploadCallback(result){
-        console.log("Upload complete");
-        console.log(result);
-      }
-
-      function drawDate(month, day, year) {
-
-        var dateStr = "" + year + "" + month + "" + day;
-        var request = {
-                owner: "sevenbit",
-                  target: "location/points",
-                  action: "READ",
-                  params: {
-                    originObj: dateStr,
-                    fields: ["time", "lat", "lon", "speed", "ele"],
-                    stats: ["max", "min"]
-                  }
-                  };
-
-        var val = nimbus.call(request, init);
-      }
-
-      var tileCount = 0;
-      function addGpxToScene(gpx){
         if(scene === undefined){
           var image = new Image();
           image.onload = function(){ // always fires the event.
@@ -278,49 +143,31 @@ if(scene === undefined){
             imgData = imgCanvas.getContext("2d").getImageData(0, 0, imgCanvas.width, imgCanvas.height).data;
 
             init();
-            addGpxToScene(gpx);
           };
-          // handle failure
-          image.onerror = function(){
 
+          image.onerror = function(err){
+            console.log('Image Err: '+ err);
           };
 
           console.log('TerrainTile');
-          console.log(gpx);
 
-          image.src = '/terrain/46.1992327,-122.1824242.png';  //St. Helens
-          //image.src = '/terrain/47.6376975,-122.3276025.png';  //Lake Union
-          //image.src = '/terrain/48.0578295,-121.7967002.png';    //Mt. Pilchuck
-          //image.src = '/terrain/47.5077377,-121.7398391.png';      // Mt.Si
-          //image.src = '/terrain/48.0107411,-121.3432104.png';     // Goat lake
+          //image.src = '/terrain/tile/elev/46.1992327,-122.1824242.png?scale=0.125';     // St. Helens
+          image.src = '/terrain/tile/elev/47.6376975,-122.3276025.png?scale=0.5';   // Lake Union
+          //image.src = '/terrain/tile/elev/48.0578295,-121.7967002.png';   // Mt. Pilchuck
+          //image.src = '/terrain/tile/elev/47.5077377,-121.7398391.png?scale=0.25';   // Mt.Si
+          //image.src = '/terrain/tile/elev/48.0107411,-121.3432104.png';   // Goat lake
           imgPreview.attr("src", image.src);
-          return;
+          //return;
         }
+      });
 
-        console.log("Segments: " + gpx.segments.length);
-        console.log('Constructing meshes...');
-        mesh = new Location.Ui.GpxThumb({});
-        mesh.group.translateX(tileCount*10 );
-        mesh.addGpx(gpx);
-        console.log(mesh);
-
-        scene.add( mesh.group );
-
-        //camera.translateY(tileCount*10);
-        //camera.lookAt(mesh.group.position);
-
-        tileCount++;
-
-
-        //render();
-      }
 
       function init() {
 
         container = document.getElementById( 'container' );
 
         camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, .1, 4000 );
-        camera.position.set( 0, 20, 0 );
+        camera.position.set( 0, 0, 500 );
 
         var axisHelper = new THREE.AxisHelper( 0.05 );
         axisHelper.translateX(-0.411 * (window.innerWidth / window.innerHeight));
@@ -468,7 +315,7 @@ if(scene === undefined){
             }
           }*/
           //oceanPlane.vertices[  j ].z = 1 - ((imgData[(oceanPlane.vertices.length - j) * 4] / 255) * 1);
-          oceanPlane.vertices[  j ].z = 150 - ((imgData[j * 4] / 255) * 150);
+          oceanPlane.vertices[  j ].z = ((imgData[j * 4] / 255) * 100);
 
           /*var data = imgData[j*4];
           if(data < 10){
@@ -483,14 +330,14 @@ if(scene === undefined){
 
       	ocean = new THREE.Mesh(oceanPlane, blackMaterial);
       	ocean.name = name +"_ocean";
-      	ocean.rotation.x = Math.PI/2;
+      	//ocean.rotation.x = Math.PI/2;
       	ocean.doubleSided = true;
         scene.add(ocean);
 
 
         ocean2 = new THREE.Mesh(oceanPlane, oceanMeshMaterial);
         ocean2.name = name +"_ocean2";
-        ocean2.rotation.x = Math.PI/2;
+        //ocean2.rotation.x = Math.PI/2;
         ocean2.doubleSided = true;
         scene.add(ocean2);
 

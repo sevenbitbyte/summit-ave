@@ -30,6 +30,10 @@ Histogram.prototype.push = function(value){
   }
 }
 
+Histogram.prototype.merge = function(otherHist){
+  var newMin = (this.min < otherHist.min) ? this.min : otherHist.min
+}
+
 Histogram.prototype.getBuckets = function(){
   var buckets = [];
   for(var idx in this.values){

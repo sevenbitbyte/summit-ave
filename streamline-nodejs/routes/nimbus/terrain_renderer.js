@@ -22,8 +22,13 @@ var TerrainRenderer = function(datasource, formats){
 
 TerrainRenderer.prototype.__proto__ = events.EventEmitter.prototype;
 
-TerrainRenderer.prototype.getPng = function(info, data){
-  var canvas = new Canvas(data.sizePx.x, data.sizePx.y)
+TerrainRenderer.prototype.getPng = function(info, data, scale){
+
+  if(!scale){
+    scale = 1.0;
+  }
+
+  var canvas = new Canvas(data.sizePx.x*scale, data.sizePx.y*scale);
   var ctx = canvas.getContext('2d');
   var hist = new Histogram(info.elevHist);
 
@@ -40,9 +45,11 @@ TerrainRenderer.prototype.getPng = function(info, data){
 
       ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
 
-      ctx.fillRect(x, (data.sizePx.y -1 )- y, 1, 1);
+      ctx.fillRect(scale * x, scale * (data.sizePx.y-y), scale, scale);
     }
   }
+
+  console.log('scale='+scale)
 
   return canvas.toBuffer();
 }
@@ -70,14 +77,15 @@ TerrainRenderer.prototype.drawTile = function(info, data){
 
   //Image formats
   if(this.formats.png || this.formats.jpeg){
+
     var canvas = new Canvas(data.sizePx.x, data.sizePx.y)
     var ctx = canvas.getContext('2d');
     var hist = new Histogram(info.elevHist);
 
     for(var y = 0; y < data.sizePx.y; y++){
       for(var x = 0; x < data.sizePx.x; x++){
-
-        var value = Math.floor(255 * hist.value(data.elev.readInt32LE(((data.sizePx.x * y) + x) * 4)));
+        //var value = Math.floor(255 * hist.value(data.elev.readInt32LE(((data.sizePx.x * y) + x) * 4)));
+        var value = Math.round(255 * (data.elev.readInt32LE(((data.sizePx.x * y) + x) * 4) / (info.elevHist.max) ));
 
         var a = 1;
         var r = value;
@@ -86,7 +94,7 @@ TerrainRenderer.prototype.drawTile = function(info, data){
 
         ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
 
-        ctx.fillRect(x, data.sizePx.y-y, 1, 1);
+        ctx.fillRect(x, (data.sizePx.y -1 )- y, 1, 1);
       }
     }
 
