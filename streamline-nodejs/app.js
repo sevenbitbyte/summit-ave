@@ -76,17 +76,6 @@ app.get('/img',
 );
 
 
-var MouseControl = require('./routes/nimbus/mousecontrol.js');
-var mouseControl = new MouseControl();
-
-app.post('/mouse',
-  function(req, res){
-    //
-    res.send('');
-    return;
-  }
-)
-
 var TerrainParser = require('./routes/nimbus/parsers/terrain_arcascii_crawler');
 var TerrainRenderer = require('./routes/nimbus/terrain_renderer.js');
 
@@ -133,7 +122,7 @@ app.get('/terrain/tile/elev/:lat,:long.png',
     var promise = query.exec();
     promise.then(
       function(infoList){
-        console.log('Found ' + infoList.length + ' tiles');
+        console.log('Found ' + infoList.length + ' tile');
 
 
         var rendered = 0;
@@ -154,7 +143,7 @@ app.get('/terrain/tile/elev/:lat,:long.png',
 
               return function(dataList){
                 console.log('Found tile data: ' + dataList.length);
-                var buffer = terrainRenderer.getPng(thatInfo, dataList[0]);
+                var buffer = terrainRenderer.getPng(thatInfo, dataList[0], parseFloat(req.query.scale));
                 console.log('Rendered tile: ' + thatInfo.id);
                 res.setHeader('Content-Type', 'image/x-png'); //Solution!
                 res.writeHead(200);
@@ -242,9 +231,5 @@ var listenPort = config.has('port') ? config.get('port') : 3000;
 
 server.listen(listenPort);
 
-process.on('SIGINT', function() {
-  console.log('App: exit detected, closing HTTP server');
-  server.close();
-});
 
 module.exports = app;
