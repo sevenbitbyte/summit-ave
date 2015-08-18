@@ -100,11 +100,13 @@ void ArcAsciiRenderer::processData(ArcAsciiData* data){
                     //120/360 - 240/360
                     qreal maxVal = ((300.0 + shift) / divisor);
                     qreal scaledValue=value/maxVal;
-                    qreal hue = (((240.0f-180.0f)/360.0f) * scaledValue) + 180.0f/360.0f;
+                    qreal hue = (((240.0f-180.0f)/360.0f) * scaledValue) + 180.0f/360.0f;         //Blue
                     //qreal hue = 360.0/360.0f - (((360.0f-240.0f)/360.0f) * (value/maxVal));
 
 
                     color = QColor::fromHsvF(hue, 1.0, 1.0 - (hue * 0.75));
+
+                    //color = QColor::fromHsvF(value, value, 1.0);
                 }
                 else{
 
@@ -112,7 +114,7 @@ void ArcAsciiRenderer::processData(ArcAsciiData* data){
                     qreal scaledValue=value/maxVal;
                     qreal hue = 240.0/360.0f - (((260.0f-160.0f)/360.0f) * (value/maxVal));
 
-                    color = QColor::fromHsvF(hue, qPow(1.0-scaledValue, 2), 1.0-(hue * 0.75));
+                    color = QColor::fromHsvF(hue, qPow(1.0-scaledValue, 2), 1.0-(hue * 0.75));    //Blue
 
                     //color = QColor::fromHsvF(0.33, 1.0f, value);	//Green
 

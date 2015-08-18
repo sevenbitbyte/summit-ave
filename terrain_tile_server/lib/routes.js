@@ -1,5 +1,7 @@
 var Joi = require('joi');
 
+var TerrainTileHandlers = require('./tile/handlers.js')
+
 exports.routes = [];
 
 exports.routes.push({
@@ -7,7 +9,7 @@ exports.routes.push({
   path: '/',
   config: {
     handler: function (request, reply) {
-      //
+      return reply();
     }
   }
 });
@@ -22,9 +24,7 @@ exports.routes.push({
         long : Joi.number().min(-180).max(180).required(),
       }
     },
-    handler: function (request, reply) {
-      //
-    }
+    handler: TerrainTileHandlers.getTileInfo
   }
 });
 
@@ -41,9 +41,7 @@ exports.routes.push({
         scale : Joi.number().min(0.0).max(1.0).default(1.0)
       }
     },
-    handler: function (request, reply) {
-      //
-    }
+    handler: TerrainTileHandlers.getTileElevPng
   }
 });
 
@@ -57,9 +55,7 @@ exports.routes.push({
         long : Joi.number().min(-180).max(180).required()
       }
     },
-    handler: function (request, reply) {
-      //
-    }
+    handler: TerrainTileHandlers.getTileData
   }
 });
 
@@ -74,12 +70,28 @@ exports.routes.push({
           lat : Joi.number().min(-90).max(90).required(),
           long : Joi.number().min(-180).max(180).required()
         })
+        )
+      }
+    },
+    handler: TerrainTileHandlers.getRegionInfo
+  }
+});
+
+exports.routes.push({
+  method: 'POST',
+  path : '/terrain/region/elev.png',
+  config : {
+    validate : {
+      payload : {
+        bounds : Joi.array().length(2).items(
+          Joi.object().keys({
+          lat : Joi.number().min(-90).max(90).required(),
+          long : Joi.number().min(-180).max(180).required()
+        })
         ),
         scale : Joi.number().min(0.0).max(1.0).default(1.0)
       }
     },
-      handler: function (request, reply) {
-        //
-      }
+    handler: TerrainTileHandlers.getRegionElevPng
   }
 });

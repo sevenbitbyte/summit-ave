@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 var debug = require('debug')('my-application');
+var Hoek = require('hoek');
+var Async = require('async');
+var fs = require('fs');
 var colors = require('colors');
 var TerrainRenderer = require('../routes/nimbus/terrain_renderer.js');
 
@@ -65,6 +68,53 @@ var renderTile = function(datasource, renderer, infoList){
       function(infoList){
         console.log('Rendering ' + infoList.length + ' tiles');
 
+
+        var count=0;
+
+        Async.each(infoList,
+          function(info, cb) {
+
+            info = Hoek.clone(info);
+
+            var dataQuery = model.TileData.find(
+              { origin: info.origin,
+                'lowerleft.x': info.lowerleft.x,
+                'lowerleft.y': info.lowerleft.y}).limit(1);
+
+            var dataPromise = dataQuery.exec();
+            dataPromise.then(
+              //function(thatInfo){
+                function(dataList){
+                  //console.log('Found tile data: ' + dataList.length);
+
+
+                  console.log('Drawing tile: ' + count++ + '/' + infoList.length);
+
+                  return render.drawTile({info: info, data: dataList[0], scale: 0.125}, cb)
+
+                  /*Async.eachSeries(
+                    [
+                      {info: info, data: dataList[0], scale: 1.0},
+                      {info: info, data: dataList[0], scale: 0.75},
+                      {info: info, data: dataList[0], scale: 0.5},
+                      {info: info, data: dataList[0], scale: 0.25},
+                      {info: info, data: dataList[0], scale: 0.125},
+                    ],
+                    render.drawTile.bind(render),
+                    function(err){
+
+                      console.log(err);
+                      console.log('Rendered tile ' + ++rendered + '/' + infoList.length);
+                      cb();
+                    }
+                  );*/
+
+                }
+              //}(info)
+            )
+          }
+        );
+/*
         var rendered = 0;
         for(infoIdx in infoList){
           info = infoList[infoIdx];
@@ -80,12 +130,17 @@ var renderTile = function(datasource, renderer, infoList){
 
               return function(dataList){
                 //console.log('Found tile data: ' + dataList.length);
-                render.drawTile(thatInfo, dataList[0]);
+                render.drawTile(thatInfo, dataList[0],1.0);
+                render.drawTile(thatInfo, dataList[0],0.75);
+                render.drawTile(thatInfo, dataList[0],0.5);
+                render.drawTile(thatInfo, dataList[0],0.25);
+                render.drawTile(thatInfo, dataList[0],0.125);
                 console.log('Rendered tile ' + ++rendered + '/' + infoList.length);
               };
             }(info)
           );
         }
+        */
       }
     );
 
