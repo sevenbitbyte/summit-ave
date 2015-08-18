@@ -267,7 +267,7 @@ var TerrainTiler = function(options){
 TerrainTiler.prototype.__proto__ = events.EventEmitter.prototype;
 
 TerrainTiler.prototype.onData = function(parsed){
-  var crawl = new TerrainModel.Crawl({path: parsed.path, time: parsed.header.time});
+  var crawl = new TerrainModel.Crawl({path: parsed.path, time: parsed.header.time, header: parsed.header});
 
   this.emit('tiling', parsed.path);
 
