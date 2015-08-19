@@ -303,6 +303,9 @@ TerrainTiler.prototype.onData = function(parsed){
       //console.log(endPx)
       //console.log(('allocing ' + (tileSizePx.x * tileSizePx.y * 4) + 'bytes').grey);
 
+      var buffer = new Buffer(tileSizePx.x * tileSizePx.y * 4);
+      buffer.fill(null);
+
       var data = new TerrainModel.TileData({
           origin : parsed.path,
           lowerleft: {x : lowerleft.x,
@@ -310,8 +313,9 @@ TerrainTiler.prototype.onData = function(parsed){
           topright : {x : topright.x, y : topright.y},
           sizeLL : tileSizeLL,
           sizePx : tileSizePx,
-          elev: new Buffer(tileSizePx.x * tileSizePx.y * 4)
+          elev: buffer
       });
+
 
       for(var y = startPx.y; y < endPx.y; y++){
         var startOffset = parsed.offset( {x: startPx.x, y: y} );
