@@ -1,0 +1,36 @@
+{
+  "name": "terrain_utils",
+  "version": "0.0.1",
+  "description": "terrain data download and stitching",
+  "main": "index.js",
+  "browser": "index.js",
+  "scripts" : {
+    "build" : "mkdir -p build; browserify index.js > ./build/timestream.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:CumulonimbusLtd/timestream.js.git"
+  },
+  "keywords": [
+    "timeline"
+  ],
+  "dependencies" : {
+    "moment" : "2.10.3",
+    "twix" : "0.6.4",
+    "touchy" : "git+ssh://git@github.com:sevenbitbyte/touchy.git",
+    "node-event-emitter" : "0.0.1"
+  },
+  "devDependencies" : {
+    "jquery" : "2.1.4",
+    "moment" : "2.10.3",
+    "twix" : "0.6.4"
+  },
+  "author": {
+    "name": "Alan Meekins",
+    "email": "alan.meekins@gmail.com",
+    "url": "http://nullagent.com"
+  },
+  "license": "MIT"
+}\
+
+//../\;
