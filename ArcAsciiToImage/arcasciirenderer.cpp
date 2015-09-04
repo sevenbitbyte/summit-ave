@@ -59,20 +59,31 @@ ArcAsciiRenderer::ArcAsciiRenderer(QList<ArcAsciiData*> headers, QObject *parent
     qreal xScale = 10000.0f / widthPx;
     qreal yScale = 10000.0f / heightPx;
 
-    _scaleFactor = xScale;
 
-    if(yScale < xScale){
-        _scaleFactor = yScale;
+    qreal renderWidth = widthPx;
+    qreal renderHeight = heightPx;
+
+    if(xScale > 1.0f && yScale > 1.0f){
+        _scaleFactor = 1.0f;
     }
+    else{
 
-    qreal renderWidth = widthPx * _scaleFactor;
-    qreal renderHeight = heightPx * _scaleFactor;
+        _scaleFactor = xScale;
+
+        if(yScale < xScale){
+            _scaleFactor = yScale;
+        }
+
+        renderWidth = widthPx * _scaleFactor;
+        renderHeight = heightPx * _scaleFactor;
+    }
 
     qDebug() << "Render Dimensions: { " << renderWidth << ", " << renderHeight << " }";
 
     _renderSizePx = QSizeF(renderWidth, renderHeight);
 
     _pixmap = QPixmap((int)renderWidth, (int)renderHeight);
+    _pixmap.fill(QColor(0,0,0,0));
 }
 
 QPixmap ArcAsciiRenderer::getPixmap(){
@@ -86,50 +97,40 @@ void ArcAsciiRenderer::processData(ArcAsciiData* data){
     int height = data->header.height;
 
     QRect boundsRenderPx = computeBounds(data->header);
-    QImage* image = new QImage(width, height, QImage::Format_RGB32);
+    QImage* image = new QImage(width, height, QImage::Format_ARGB32_Premultiplied);
+
+    qDebug() << "Stats.minElevation: " << _stats.minElevation;
+    qDebug() << "Stats.maxElevation: " << _stats.maxElevation;
 
     if(data->elevation.size() > 0){
         float shift = -_stats.minElevation;
         float divisor = (_stats.maxElevation + shift);
+
+        qDebug() << "Shift: " << shift;
+        qDebug() << "Divisor: " << divisor;
+        qDebug() << "Alpha Channel: " << image->hasAlphaChannel();
+
         for(int j=0; j < (width * height); j++){
-            QColor color(0,0,0);
+            QColor color(0,0,0,0);
             if(data->elevation[j] != data->header.noData){
                 float value = ((data->elevation[j] + shift) / divisor);
 
-                if(data->elevation[j] < 300){
-                    //120/360 - 240/360
-                    qreal maxVal = ((300.0 + shift) / divisor);
-                    qreal scaledValue=value/maxVal;
-                    qreal hue = (((240.0f-180.0f)/360.0f) * scaledValue) + 180.0f/360.0f;
-                    //qreal hue = 360.0/360.0f - (((360.0f-240.0f)/360.0f) * (value/maxVal));
-
-
-                    color = QColor::fromHsvF(hue, 1.0, 1.0 - (hue * 0.75));
+                if(value > 1.0f || value < 0.0f){
+                    qDebug() << "Out of range, value:" << value;
+                    qDebug() << "Elevation: " << data->elevation[j];
                 }
-                else{
 
-                    qreal maxVal = ((_stats.maxElevation + shift) / divisor);
-                    qreal scaledValue=value/maxVal;
-                    qreal hue = 240.0/360.0f - (((260.0f-160.0f)/360.0f) * (value/maxVal));
-
-                    color = QColor::fromHsvF(hue, qPow(1.0-scaledValue, 2), 1.0-(hue * 0.75));
-
-                    //color = QColor::fromHsvF(0.33, 1.0f, value);	//Green
-
-                    //qreal maxVal = ((300.0 + shift) / divisor);
-                    //qreal hue = 240.0/360.0f - (((260.0f-160.0f)/360.0f) * (value/maxVal));
-
-                    //color = QColor::fromHsvF(0.0f, 1.0, 1.0-(hue * 0.75));
-
-                    //color = QColor::fromHsvF(0.0, 0.0f, );	//Black
-                }
+                Q_ASSERT(value >= 0.0f);
+                Q_ASSERT(value <= 1.0f);
 
                 //color = QColor::fromHsvF(value, value, 1.0);
                 //color = QColor::fromHsvF(0.33, 1.0f, value);	//Green
                 //color = QColor::fromHsvF(0.0, 0.0f, log(value+.1)+2);	//Black
+                color = QColor::fromHsvF(0.0f, 0.0f, value);	//Black
+                color.setAlpha(255);
             }
 
-            image->setPixel( j % width, j / width, color.rgb() );
+            image->setPixel( j % width, j / width, color.rgba() );
 
             if( j % width == 0){
                 qreal progressPercent = ((qreal) j) / (qreal)(width * height);
@@ -140,6 +141,7 @@ void ArcAsciiRenderer::processData(ArcAsciiData* data){
         QImage scaledImg = image->scaled( boundsRenderPx.width(), boundsRenderPx.height() );
 
         QPainter painter(&_pixmap);
+        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
         painter.drawImage(boundsRenderPx.topLeft().x(), boundsRenderPx.topLeft().y(), scaledImg);
         delete image;
         emit tileComplete( boundsRenderPx );

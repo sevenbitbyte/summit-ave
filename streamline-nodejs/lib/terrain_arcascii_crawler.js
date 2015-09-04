@@ -4,8 +4,8 @@ var byline = require('byline');
 var events = require('events');
 var Promise = require('mpromise');
 var mongoose = require('mongoose');
-var Histogram = require('../histogram.js');
-var db_connection = mongoose.createConnection('mongodb://localhost/streamline-terrain');
+var Histogram = require('histogram.js');
+var db = require('./db,js');
 
 var model = require('../models/terrain_model');
 var TerrainModel = undefined;
@@ -16,16 +16,16 @@ var reportError = function(value){
 
 
 
-db_connection.on('error', reportError);
+db.on('error', reportError);
 
-db_connection.on('connecting', function(){ console.log('mongoose connecting'); });
-db_connection.on('connected', function(){ console.log('mongoose connected'); });
+db.on('connecting', function(){ console.log('mongoose connecting'); });
+db.on('connected', function(){ console.log('mongoose connected'); });
 
 
-db_connection.on('disconnecting', function(){ console.log('mongoose disconnecting'); });
-db_connection.on('disconnected', function(){ console.log('mongoose disconnected'); });
-db_connection.on('close', function(){ console.log('mongoose close'); });
-db_connection.on('reconnected', function(){ console.log('mongoose reconnected'); });
+db.on('disconnecting', function(){ console.log('mongoose disconnecting'); });
+db.on('disconnected', function(){ console.log('mongoose disconnected'); });
+db.on('close', function(){ console.log('mongoose close'); });
+db.on('reconnected', function(){ console.log('mongoose reconnected'); });
 
 
 
@@ -38,9 +38,9 @@ var TerrainDataSource = function(options){
   this.tiler = new TerrainTiler({});
   this.on('parsed', this.tiler.onData.bind(this.tiler));
 
-  db_connection.on('connected',
+  db.on('connected',
     function(){
-      TerrainModel = new model.TerrainModel(mongoose, db_connection);
+      TerrainModel = new model.TerrainModel(mongoose, db);
       this.emit('ready');
     }.bind(this)
   );
