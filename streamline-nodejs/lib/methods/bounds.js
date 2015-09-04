@@ -1,4 +1,5 @@
 var Hoek = require('hoek')
+var Point = require('./point')
 
 var Bounds = function(options){
   this.lower = new Point(Hoek.reach(options, 'lower', undefined, true))
