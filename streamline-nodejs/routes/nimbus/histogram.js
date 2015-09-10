@@ -31,7 +31,19 @@ Histogram.prototype.push = function(value){
 }
 
 Histogram.prototype.merge = function(otherHist){
-  var newMin = (this.min < otherHist.min) ? this.min : otherHist.min
+  this.min = (this.min < otherHist.min) ? this.min : otherHist.min
+  this.max = (this.max > otherHist.max) ? this.max : otherHist.max
+
+  for(var idx in otherHist.values){
+    var count = otherHist.values[idx];
+
+    if(this.values[idx]){
+      this.values[idx] += count;
+    }
+    else{
+      this.values[idx] = 0 + count;
+    }
+  }
 }
 
 Histogram.prototype.getBuckets = function(){

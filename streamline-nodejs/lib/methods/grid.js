@@ -7,10 +7,6 @@ var LLGrid = function(options){
 
   this.grids = {};
 
-  /*for(var idx = 0; idx < this.count(); idx++){
-    this.grids[idx] = this.gridIndexToBounds(idx);
-  }*/
-
   return this;
 }
 
@@ -77,8 +73,8 @@ LLGrid.prototype.gridsWithinBounds = function(bounds){
 
   for (var y = 0; y < deltaY; y++){
     for(var x = 0; x < deltaX; x++){
-      
-      var idx = (bottomLeft + x) + (tileWidth * y)
+
+      var idx = Math.round((bottomLeft + x) + (tileWidth * y))
       indexes.push(idx)
     }
   }

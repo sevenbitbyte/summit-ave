@@ -19,6 +19,14 @@ var TerrainModel = function(mongoose, connection){
   });
   this.TileData = connection.model('TileData', this.TileDataSchema);
 
+  this.TileRenderInfoSchema = new mongoose.Schema({
+    idx : Number,
+    sizePx : {x:Number, y:Number},
+    sizeLL : {x:Number, y:Number},
+    path : String
+  });
+  this.TileRenderInfo = connection.model('TileRenderInfo', this.TileRenderInfoSchema);
+
   this.CrawlSchema = new mongoose.Schema({
     path : String,
     time : Number
