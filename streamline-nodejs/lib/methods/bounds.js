@@ -1,4 +1,5 @@
 var Hoek = require('hoek')
+var Point = require('./point')
 
 var Bounds = function(options){
   this.lower = new Point(Hoek.reach(options, 'lower', undefined, true))
@@ -79,7 +80,7 @@ Bounds.prototype.within = function(x, y){
   return (withinX && withinY);
 }
 
-Bounds.prototype.intersect = function(other, recurse){
+Bounds.prototype.intersect = function(other){
 
   if( this.within(other.topLeft()) || this.within(other.topRight()) ||
       this.within(other.bottomLeft()) || this.within(other.bottomRight()) )
