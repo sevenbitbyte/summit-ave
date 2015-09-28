@@ -5,25 +5,13 @@
   "main": "index.js",
   "browser": "index.js",
   "scripts" : {
-    "build" : "mkdir -p build; browserify index.js > ./build/timestream.js"
+    "build" : "mkdir -p build; browserify index.js > ./build/terrain_utils.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:CumulonimbusLtd/timestream.js.git"
-  },
-  "keywords": [
-    "timeline"
-  ],
   "dependencies" : {
-    "moment" : "2.10.3",
-    "twix" : "0.6.4",
-    "touchy" : "git+ssh://git@github.com:sevenbitbyte/touchy.git",
     "node-event-emitter" : "0.0.1"
   },
   "devDependencies" : {
-    "jquery" : "2.1.4",
-    "moment" : "2.10.3",
-    "twix" : "0.6.4"
+    "jquery" : "2.1.4"
   },
   "author": {
     "name": "Alan Meekins",
