@@ -4,7 +4,7 @@ var Hoek = require('hoek');
 var Async = require('async');
 var fs = require('fs');
 var colors = require('colors');
-var TerrainRenderer = require('../routes/nimbus/terrain_renderer.js');
+var TerrainRenderer = require('../lib/terrain_renderer.js');
 
 var renderTile = function(datasource, renderer, infoList){
   /*

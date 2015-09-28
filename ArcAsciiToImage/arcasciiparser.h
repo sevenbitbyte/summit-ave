@@ -18,9 +18,11 @@ struct ArcAsciiStatistics {
 
     QMap<qint32, qint32> histogram;
 
+    ArcAsciiStatistics();
     QVariantMap toVariantMap();
     bool loadFromVariant(QVariant variant);
     void merge(ArcAsciiStatistics& other);
+    void push(qreal value);
 };
 
 

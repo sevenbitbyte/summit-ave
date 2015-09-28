@@ -4,9 +4,14 @@
 ArcAsciiData::ArcAsciiData(QObject* parent) :
     QObject(parent)
 {
-    stats.maxElevation = -9999;
-    stats.minElevation = 99999;
+    //stats.maxElevation = -9999;
+    //stats.minElevation = 99999;
     file = NULL;
+}
+
+ArcAsciiStatistics::ArcAsciiStatistics(){
+    maxElevation = -9999;
+    minElevation = 99999;
 }
 
 QVariantMap ArcAsciiStatistics::toVariantMap(){
@@ -57,7 +62,7 @@ bool ArcAsciiStatistics::loadFromVariant(QVariant variant){
     }
 
     maxElevation = map["maxElevation"].toInt();
-    minElevation = map["maxElevation"].toInt();
+    minElevation = map["minElevation"].toInt();
 
     QMap<QString,QVariant> histogramMap = map["histogram"].toMap();
 
@@ -78,12 +83,12 @@ bool ArcAsciiStatistics::loadFromVariant(QVariant variant){
 }
 
 void ArcAsciiStatistics::merge(ArcAsciiStatistics& other){
-    if(other.minElevation < minElevation){
-        minElevation = other.minElevation;
+    if(other.minElevation < this->minElevation){
+        this->minElevation = other.minElevation;
     }
 
-    if(other.maxElevation > maxElevation){
-        maxElevation = other.maxElevation;
+    if(other.maxElevation > this->maxElevation){
+        this->maxElevation = other.maxElevation;
     }
 
     QMap<qint32,qint32>::iterator otherHistIter = other.histogram.begin();
@@ -95,6 +100,24 @@ void ArcAsciiStatistics::merge(ArcAsciiStatistics& other){
             histogram.insert( otherHistIter.key(), otherHistIter.value() );
         }
     }
+}
+
+void ArcAsciiStatistics::push(qreal value){
+    if(value < this->minElevation){
+        this->minElevation = value;
+    }
+
+    if(value > this->maxElevation){
+        this->maxElevation = value;
+    }
+
+    //Update histogram
+    int bucket = (value/10);
+    if( !this->histogram.contains(bucket) ){
+        this->histogram.insert(bucket, 0);
+    }
+
+    this->histogram[bucket] = this->histogram[bucket] + 1;
 }
 
 
@@ -301,21 +324,7 @@ bool ArcAsciiParser::loadElevation(ArcAsciiData* data){
 
                 if(elevation != data->header.noData){
                     //Update min/max elevation
-                    if( elevation > data->stats.maxElevation ){
-                        data->stats.maxElevation = elevation;
-                    }
-
-                    if( elevation < data->stats.minElevation ){
-                        data->stats.minElevation = elevation;
-                    }
-
-                    //Update histogram
-                    int bucket = (elevation/10);
-                    if( !data->stats.histogram.contains(bucket) ){
-                        data->stats.histogram.insert(bucket, 0);
-                    }
-
-                    data->stats.histogram[bucket] = data->stats.histogram[bucket] + 1;
+                    data->stats.push(elevation);
                 }
 
                 elevationIdx++;

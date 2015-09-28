@@ -5,7 +5,7 @@
   "main": "index.js",
   "browser": "index.js",
   "scripts" : {
-    "build" : "mkdir -p build; browserify index.js > ./build/terrain_utils.js"
+    "build" : "mkdir -p build; browserify index.js > ./build/TerrainUtils.js"
   },
   "dependencies" : {
     "node-event-emitter" : "0.0.1"

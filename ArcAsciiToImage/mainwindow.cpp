@@ -200,7 +200,9 @@ void MainWindow::saveFile(){
 
     QPixmap pixmap = renderer->getPixmap();
 
-    pixmap.save(outputPath, "jpg", 100);
+    pixmap.save(outputPath, "PNG", 100);
+
+    qDebug() << "Pixmap Alpha Channel: " << pixmap.hasAlphaChannel();
 }
 
 
