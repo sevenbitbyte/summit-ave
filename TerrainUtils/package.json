@@ -8,11 +8,10 @@
     "build" : "mkdir -p build; browserify index.js > ./build/TerrainUtils.js"
   },
   "dependencies" : {
+    "node-event-emitter" : "0.0.1"
   },
   "devDependencies" : {
-    "jquery" : "2.1.4",
-    "moment" : "2.10.3",
-    "twix" : "0.6.4"
+    "jquery" : "2.1.4"
   },
   "author": {
     "name": "Alan Meekins",
