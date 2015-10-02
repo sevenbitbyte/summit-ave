@@ -8,6 +8,8 @@
 
 ORIGINAL_PWD=$PWD
 
+echo "ORIGINAL_PWD=$ORIGINAL_PWD"
+
 set -e
 
 PROJECT_NAME="clnb-environment-controller"
@@ -82,6 +84,8 @@ echo "NEEDED_PKGS_DEPS: $NEEDED_PKGS_DEPS"
 
 sudo apt-get install -y --no-install-recommends $NEEDED_PKGS
 
+echo "BUILDING ROS"
+
 # build ROS packages
 ./src/catkin/bin/catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release
 
@@ -93,7 +97,7 @@ mkdir -p install_isolated/meta
 cat <<EOF > install_isolated/meta/package.yaml
 name: $PROJECT_NAME
 architecture: `dpkg --print-architecture`
-version: 0.3
+version: 0.1
 vendor: Alan Meekins <alan@clnb.io>
 icon: meta/ros-tutorial.svg
 binaries:
@@ -153,6 +157,6 @@ if [ ! -e $WORKSPACE/$PROJECT_NAME*.snap ]; then
     exit 1
 fi
 
-echo Successfully built $(ls $WORKSPACE/$PROJECT_NAME*.snap)
-
 cp $WORKSPACE/$PROJECT_NAME*.snap $ORIGINAL_PWD
+
+echo Successfully built $(ls $WORKSPACE/$PROJECT_NAME*.snap)
