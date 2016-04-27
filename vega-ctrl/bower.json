@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "angular-socket-io": "~0.7.0",
-    "angular-chart.js": "^0.8.8"
+    "angular-chart.js": "^0.8.8",
+    "roslib": "^0.18.0"
   }
 }
