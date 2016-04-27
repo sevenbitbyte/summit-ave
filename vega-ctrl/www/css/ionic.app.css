@@ -9108,7 +9108,18 @@ a.button {
 .home .item-group {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-around; }
+  justify-content: space-around;
+  background: white; }
+
+.home .item-group-content {
+  margin: auto; }
+
+.home .gantry .gantry-img {
+  width: 18%;
+  height: 100%; }
+
+.home .gantry .gantry-visual {
+  background: black; }
 
 .status .card {
   border: ridge gold;

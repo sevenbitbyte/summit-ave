@@ -14,6 +14,7 @@ angular.module('app', [
 	.factory('Utils', Utils)
 	.factory('AnnyangService', AnnyangService)
   .factory('ROSService', ROSService)
+  .factory('JoystickService', JoystickService)
 	.controller('Home', Home)
 	.controller('Status', Status)
   .controller('Control', Control)

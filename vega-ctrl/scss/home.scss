@@ -1,5 +1,4 @@
 .home {
-
   .stream {
     height: 36vh;
   }
@@ -23,6 +22,28 @@
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
-    // background: white;
+    background: white;
+  }
+
+  .item-group-content {
+    margin: auto;
+  }
+
+  // .range input[type="range"]::-webkit-slider-thumb {
+  //   -webkit-appearance: none;
+  //   -moz-apperance: none;
+  //   width: 45px;
+  //   height: 45px;
+  //   background-image: url(../assets/img/Comedy_anger.png);
+  // }
+
+  .gantry {
+    .gantry-img {
+      width: 18%;
+      height: 100%;
+    }
+    .gantry-visual {
+      background: black;
+    }
   }
 }
