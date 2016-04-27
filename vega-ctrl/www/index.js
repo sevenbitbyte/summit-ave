@@ -13,14 +13,17 @@ angular.module('app', [
 	.factory('DataStore', DataStore)
 	.factory('Utils', Utils)
 	.factory('AnnyangService', AnnyangService)
+  .factory('ROSService', ROSService)
 	.controller('Home', Home)
 	.controller('Status', Status)
   .controller('Control', Control)
+  .controller('Stream', Stream)
 
 function config($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
 	// if none of the above states are matched, use this as the fallback
 	console.log('config');
+
 	$ionicConfigProvider.views.maxCache(0);
 
 	$urlRouterProvider.otherwise('/home');

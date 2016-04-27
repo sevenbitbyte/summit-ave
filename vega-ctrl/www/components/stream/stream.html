@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<div class="stream" ng-controller="Stream as streamCtrl">
+
+  <div class="bar bar-positive item-positive item-select">
+    <h1 class="title">Vega Vision</h1>
+    <select ng-model="streamCtrl.selectedTopic">
+      <option ng-repeat="(key, val) in streamCtrl.topics" value="{{val}}">{{key}}</option>
+    </select>
+  </div>
+
+  <img class="stream-frame" ng-src="http://{{streamCtrl.url}}:{{streamCtrl.port}}/stream?topic={{streamCtrl.selectedTopic}}" />
+
+  <!-- <div ng-repeat="(key, val) in streamCtrl.url">
+  </div> -->
+
+</div>

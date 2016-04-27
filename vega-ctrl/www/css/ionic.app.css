@@ -9090,8 +9090,12 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
-.home .visualizer {
+.home .stream {
   height: 36vh; }
+
+.home .stream-frame {
+  width: 100%;
+  height: 100%; }
 
 .home .item-input {
   color: white;
