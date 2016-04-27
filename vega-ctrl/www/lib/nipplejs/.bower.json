@@ -1,0 +1,24 @@
+{
+  "version": "0.6.2",
+  "name": "nipplejs",
+  "homepage": "https://github.com/yoannmoinet/nipplejs",
+  "author": "Yoann Moinet <yoann.moinet@gmail.com>",
+  "description": "A virtual joystick for touch capable interfaces",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "_release": "0.6.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.6.2",
+    "commit": "0223858434c123fec9af05da99c8f29e3c795bb9"
+  },
+  "_source": "https://github.com/yoannmoinet/nipplejs.git",
+  "_target": "^0.6.2",
+  "_originalSource": "nipplejs",
+  "_direct": true
+}

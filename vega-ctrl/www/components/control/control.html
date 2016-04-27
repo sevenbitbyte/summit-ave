@@ -3,8 +3,7 @@
 
   <div class="bar bar-positive item-positive item-select">
     <h1 class="title">Vega Controller</h1>
-    <select ng-model='controlCtrl.selected'>
-      <option ng-repeat="(key, val) in controlCtrl.type" value="{{key}}">{{val.label}}</option>
+    <select ng-model='controlCtrl.selected' ng-options='key as val.label for (key , val) in controlCtrl.type'>
     </select>
   </div>
 

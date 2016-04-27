@@ -9121,6 +9121,10 @@ a.button {
 .home .gantry .gantry-visual {
   background: black; }
 
+.home .joystick #joyfield {
+  position: relative;
+  height: 45vh; }
+
 .status .card {
   border: ridge gold;
   border-radius: 18px; }

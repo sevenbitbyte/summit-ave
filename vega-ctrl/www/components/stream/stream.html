@@ -3,8 +3,7 @@
 
   <div class="bar bar-positive item-positive item-select">
     <h1 class="title">Vega Vision</h1>
-    <select ng-model="streamCtrl.selectedTopic">
-      <option ng-repeat="(key, val) in streamCtrl.topics" value="{{val}}">{{key}}</option>
+    <select ng-model="streamCtrl.selectedTopic" ng-options='val as key for (key , val) in streamCtrl.topics'>
     </select>
   </div>
 
