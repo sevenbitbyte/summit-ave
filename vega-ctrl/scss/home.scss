@@ -1,0 +1,23 @@
+.home {
+
+  .visualizer {
+    height: 36vh;
+  }
+
+  .item-input {
+    color: white;
+    background: white;
+  }
+
+  .card {
+    border-radius: 18px;
+    border: ridge gold;
+  }
+
+  .item-group {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    // background: white;
+  }
+}

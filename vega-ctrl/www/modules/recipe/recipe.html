@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<ion-view class="recipe" cache-view="false" title="{{recipeCtrl.content.name}}">
+  <ion-nav-buttons side="left">
+    <button class="button button-positive" ng-click="recipeCtrl.goHome()">
+      Back
+    </button>
+  </ion-nav-buttons>
+
+  <ion-content class="has-header app-bg">
+
+    <span ng-include="'modules/recipe/components/ingredients.html'"></span>
+
+    <span ng-include="'modules/recipe/components/tools.html'"></span>
+
+    <span ng-include="'components/steps/steps.html'"></span>
+
+  </ion-content>
+</ion-view>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<ion-nav-bar class="bar">
+  <ion-nav-title>
+    Vega Status
+  </ion-nav-title>
+</ion-nav-bar>
+<ion-view class="status">
+  <ion-content class="has-header">
+
+    <div class="card" ng-repeat="(key, value) in statusCtrl.cards">
+      <div class="item item-toggle">
+        {{value.label}}
+        <!-- <label class="toggle toggle-positive">
+          <input type="checkbox">
+          <div class="track">
+            <div class="handle"></div>
+          </div>
+        </label> -->
+      </div>
+    </div>
+
+
+  </ion-content>
+</ion-view>
