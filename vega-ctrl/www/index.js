@@ -13,12 +13,13 @@ angular.module('app', [
 	.factory('DataStore', DataStore)
 	.factory('Utils', Utils)
 	.factory('AnnyangService', AnnyangService)
-  .factory('ROSService', ROSService)
-  .factory('JoystickService', JoystickService)
-	.controller('Home', Home)
+	.factory('ROSService', ROSService)
+	.factory('JoystickService', JoystickService)
+	.controller('Controller', Controller)
 	.controller('Status', Status)
-  .controller('Control', Control)
-  .controller('Stream', Stream)
+	.controller('Utility', Utility)
+	.controller('Control', Control)
+	.controller('Stream', Stream)
 
 function config($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
@@ -27,9 +28,9 @@ function config($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
 	// $ionicConfigProvider.views.maxCache(0);
 
-  $ionicConfigProvider.tabs.position('bottom');
+	$ionicConfigProvider.tabs.position('bottom');
 
-	$urlRouterProvider.otherwise('/home');
+	$urlRouterProvider.otherwise('/controller');
 
 	$stateProvider
 		.state('tabs', {
@@ -37,21 +38,30 @@ function config($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 			abstract: true,
 			templateUrl: "modules/tabs.html"
 		})
-		.state('tabs.home', {
-			url: '/home',
+		.state('tabs.controller', {
+			url: '/controller',
 			views: {
-				'home-tab': {
-					templateUrl: 'modules/home/home.html',
-					controller: 'Home as homeCtrl'
+				'controller-tab': {
+					templateUrl: 'modules/controller/controller.html',
+					controller: 'Controller as controllerCtrl'
 				}
 			}
 		})
 		.state('tabs.status', {
 			url: '/status',
-      views: {
+			views: {
 				'status-tab': {
-          templateUrl: 'modules/status/status.html',
-          controller: 'Status as statusCtrl'
+					templateUrl: 'modules/status/status.html',
+					controller: 'Status as statusCtrl'
+				}
+			}
+		})
+		.state('tabs.utility', {
+			url: '/utility',
+			views: {
+				'utility-tab': {
+					templateUrl: 'modules/utility/utility.html',
+					controller: 'Utility as utilityCtrl'
 				}
 			}
 		})

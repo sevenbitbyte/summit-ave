@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<div class="services">
+  <div class="card">
+    <div class="item item-toggle">
+      {{utilityCtrl.cards.nodes.msg.length}} Nodes
+      <label class="toggle toggle-positive">
+        <input type="checkbox" ng-model="showNodes">
+        <div class="track">
+          <div class="handle"></div>
+        </div>
+      </label>
+    </div>
+
+    <div class="item-input-inset">
+      <label class="item-input-wrapper">
+        <i class="icon ion-ios-search-strong placeholder-icon"></i>
+        <input type="text" placeholder="Node Search" ng-model="nodeQuery">
+      </label>
+      <button class="button button-clear" ng-click="nodeQuery = null">
+        <i class="icon ion-ios-close-outline"></i>
+      </button>
+    </div>
+
+    <div ng-if="showNodes || nodeQuery">
+      <ion-item ng-repeat="n in utilityCtrl.cards.nodes.msg | filter : nodeQuery" class="item-text-wrap">
+        {{n}}
+      </ion-item>
+    </div>
+
+  </div>
+
+</div>
