@@ -1,11 +1,9 @@
 "use strict()";
 
-function Status($http, $state, $ionicLoading, $ionicPopup, DataStore) {
+function Status($http, $scope, $state, $ionicLoading, $ionicPopup, DataStore, ROSService) {
 	console.log("StatusCtrl");
 
 	var statusCtrl = this;
-
-	var dev = true;
 
 	statusCtrl.cards = {
 		users: {
@@ -30,5 +28,25 @@ function Status($http, $state, $ionicLoading, $ionicPopup, DataStore) {
 			label: 'Services'
 		}
 	}
+
+	ROSService.start()
+		.then(function (ros) {
+			console.log(ros);
+			ros.getServices(function (msg) {
+
+				$scope.$evalAsync(function () {
+					statusCtrl.cards.services.msg = msg;
+					console.log(statusCtrl.cards.services);
+				})
+
+
+
+			}, function (err) {
+				return console.log(err);
+			});
+
+
+
+		})
 
 }

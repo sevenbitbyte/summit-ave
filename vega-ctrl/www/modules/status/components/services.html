@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<div class="services">
+  <div class="card">
+    <div class="item item-toggle">
+      {{statusCtrl.cards.services.msg.length}} Services
+      <label class="toggle toggle-positive">
+        <input type="checkbox" ng-model="show">
+        <div class="track">
+          <div class="handle"></div>
+        </div>
+      </label>
+    </div>
+    <label class="item item-input">
+      <i class="icon ion-search placeholder-icon"></i>
+      <input type="text" placeholder="Search" ng-model="servicesQuery">
+    </label>
+    <div ng-if="show">
+      <ion-item ng-repeat="s in statusCtrl.cards.services.msg | filter : servicesQuery" class="item-text-wrap">
+        {{s}}
+      </ion-item>
+    </div>
+
+  </div>
+
+</div>

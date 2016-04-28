@@ -5,8 +5,6 @@ function Home($http, $state, $ionicLoading, $ionicPopup, DataStore) {
 
   var homeCtrl = this;
 
-  var dev = true;
-
   homeCtrl.colors = ["positive", "royal", "balanced"];
 
 }

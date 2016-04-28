@@ -7,18 +7,7 @@
 <ion-view class="status">
   <ion-content class="has-header">
 
-    <div class="card" ng-repeat="(key, value) in statusCtrl.cards">
-      <div class="item item-toggle">
-        {{value.label}}
-        <!-- <label class="toggle toggle-positive">
-          <input type="checkbox">
-          <div class="track">
-            <div class="handle"></div>
-          </div>
-        </label> -->
-      </div>
-    </div>
-
+    <span ng-repeat="(key, value) in statusCtrl.cards" ng-include="'modules/status/components/' + key + '.html'"></span>
 
   </ion-content>
 </ion-view>

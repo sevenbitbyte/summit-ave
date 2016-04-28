@@ -1,21 +1,16 @@
-function JoystickService(Utils) {
+function JoystickService(Utils, $q) {
 	console.log('JoystickService');
 
-	var isReady = false;
+	var deferred = $q.defer();
 
-	var start = function (callback) {
-		if(isReady) {
-			return callback();
-		} else {
-			Utils.loadScript("./lib/nipplejs/dist/nipplejs.min.js",
-				function () {
-					console.log("Nipple Loaded!");
+	Utils.loadScript("./lib/nipplejs/dist/nipplejs.min.js",
+		function () {
+			console.log("Nipple Loaded!");
+			deferred.resolve();
+		});
 
-          isReady = true;
-
-					return callback();
-				});
-		}
+	function start() {
+		return deferred.promise;
 	}
 
 	return {

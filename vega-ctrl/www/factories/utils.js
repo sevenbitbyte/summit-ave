@@ -1,5 +1,7 @@
 function Utils() {
 
+	var dev = true;
+
 	var loadScript = function (src, callback) {
 
 		var script = document.createElement("script");
@@ -11,7 +13,10 @@ function Utils() {
 	};
 
 	return {
-		loadScript: loadScript
+		loadScript: loadScript,
+		isDev : function () {
+			return dev;
+		}
 	}
 
 }

@@ -25,7 +25,9 @@ function config($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 	// if none of the above states are matched, use this as the fallback
 	console.log('config');
 
-	$ionicConfigProvider.views.maxCache(0);
+	// $ionicConfigProvider.views.maxCache(0);
+
+  $ionicConfigProvider.tabs.position('bottom');
 
 	$urlRouterProvider.otherwise('/home');
 
