@@ -1,12 +1,18 @@
-function SocketServ (socketFactory) {
-  console.log('SocketServ');
+(function () {
+	"use strict";
+	angular.module('app')
+		.factory('SocketService', ['socketFactory', SocketService])
 
-  var mis = io.connect('https://quan-api.mybluemix.net/');
-  // var mis = io.connect('http://localhost:1314/');
+	function SocketService(socketFactory) {
+		console.log('SocketServ');
 
-  mySocket = socketFactory({
-    ioSocket : mis,
-  });
+		var mis = io.connect('https://quan-api.mybluemix.net/');
+		// var mis = io.connect('http://localhost:1314/');
 
-  return mySocket;
-}
+		mySocket = socketFactory({
+			ioSocket: mis,
+		});
+
+		return mySocket;
+	}
+}())

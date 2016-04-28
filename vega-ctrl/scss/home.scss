@@ -37,13 +37,18 @@
   //   background-image: url(../assets/img/Comedy_anger.png);
   // }
 
+  .control-scroll {
+    height: 49.5vh;
+  }
+
   .gantry {
     .gantry-img {
+      max-width: 99px;
       width: 18%;
-      height: 100%;
     }
     .gantry-visual {
       background: black;
+      max-height: 36vh;
     }
   }
 

@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <div class="audio">
-
   <div class="item-group card">
-    <div class="item item-group-content text-center button" ng-repeat="s in controlCtrl.sounds track by $index">
-      {{s}}
+    <div class="item item-group-content text-center button" ng-repeat="(key, value) in controlCtrl.soundclips" ng-click="controlCtrl.playClip(value)">
+      {{key}}
     </div>
   </div>
-
-
 </div>

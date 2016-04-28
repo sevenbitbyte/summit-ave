@@ -1,19 +1,25 @@
-function JoystickService(Utils, $q) {
-	console.log('JoystickService');
+(function () {
+	"use strict";
+	angular.module('app')
+		.factory('JoystickService', ['Utils', '$q', JoystickService])
 
-	var deferred = $q.defer();
+	function JoystickService(Utils, $q) {
+		console.log('JoystickService');
 
-	Utils.loadScript("./lib/nipplejs/dist/nipplejs.min.js",
-		function () {
-			console.log("Nipple Loaded!");
-			deferred.resolve();
-		});
+		var deferred = $q.defer();
 
-	function start() {
-		return deferred.promise;
+		Utils.loadScript("./lib/nipplejs/dist/nipplejs.min.js",
+			function () {
+				console.log("Nipple Loaded!");
+				deferred.resolve();
+			});
+
+		function start() {
+			return deferred.promise;
+		}
+
+		return {
+			start: start
+		};
 	}
-
-	return {
-		start: start
-	};
-}
+}())

@@ -1,10 +1,13 @@
-"use strict()";
+(function () {
+	"use strict";
+	angular.module('app')
+		.controller('Controller', [Controller])
 
-function Controller($http, $state, $ionicLoading, $ionicPopup, DataStore) {
-  console.log("ControllerCtrl");
+	function Controller() {
+		console.log("ControllerCtrl");
 
-  var controllerCtrl = this;
+		var controllerCtrl = this;
 
-  controllerCtrl.colors = ["positive", "royal", "balanced"];
-
-}
+		controllerCtrl.colors = ["positive", "royal", "balanced"];
+	}
+}())

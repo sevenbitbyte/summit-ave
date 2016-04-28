@@ -1,22 +1,27 @@
-function Utils() {
+(function () {
+	"use strict";
+	angular.module('app')
+		.factory('Utils', [Utils]);
 
-	var dev = true;
+	function Utils() {
 
-	var loadScript = function (src, callback) {
+		var dev = true;
 
-		var script = document.createElement("script");
-		script.type = "text/javascript";
-		script.src = src;
-		script.async = true;
-		if(callback) script.onload = callback;
-	  document.getElementsByTagName("head")[0].appendChild(script);
-	};
+		var loadScript = function (src, callback) {
 
-	return {
-		loadScript: loadScript,
-		isDev : function () {
-			return dev;
+			var script = document.createElement("script");
+			script.type = "text/javascript";
+			script.src = src;
+			script.async = true;
+			if(callback) script.onload = callback;
+			document.getElementsByTagName("head")[0].appendChild(script);
+		};
+
+		return {
+			loadScript: loadScript,
+			isDev: function () {
+				return dev;
+			}
 		}
 	}
-
-}
+}())
