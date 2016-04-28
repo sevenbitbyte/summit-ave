@@ -9,7 +9,27 @@ function ROSService(Utils, $location, $q) {
 
 	var ros;
 
-	var eyePos;
+	var eyePos = {
+		name: '/head/eye_positions',
+		messageType: 'std_msgs/Int8MultiArray'
+	};
+
+	var bumpSensor = {
+		name: '/turtlebot/sensor_state',
+		messageType: 'create_node/TurtlebotSensorState',
+		bumpkey: 'bumps_wheeldrops',
+		scb: function (msg) {
+			// console.log('Received message on ' + bumpSensor.topic.name + ': ', msg[bumpSensor.bumpkey]);
+			var bumpDegree = msg[bumpSensor.bumpkey];
+
+			if(navigator.vibrate && bumpDegree != 0) {
+				// vibration API supported
+				console.log("Should be vibrating");
+				navigator.vibrate(bumpDegree);
+			}
+
+		}
+	};
 
 	/*
 	  CDN links:
@@ -30,6 +50,18 @@ function ROSService(Utils, $location, $q) {
 		console.log('Connection to websocket server closed.');
 	}
 
+	function generateTopicListener(name, messageType, scb) {
+		var listener = new ROSLIB.Topic({
+			ros: ros,
+			name: name,
+			messageType: messageType
+		});
+
+		if(scb) listener.subscribe(scb)
+
+		return listener;
+	}
+
 	var deferred = $q.defer();
 
 	Utils.loadScript("./lib/eventemitter2/lib/eventemitter2.js",
@@ -48,11 +80,9 @@ function ROSService(Utils, $location, $q) {
 					ros.on('error', errorHandler);
 					ros.on('close', closeHandler);
 
-					eyePos = new ROSLIB.Topic({
-						ros: ros,
-						name: '/head/eye_positions',
-						messageType: 'std_msgs/Int8MultiArray'
-					})
+					eyePos.topic = generateTopicListener(eyePos.name, eyePos.messageType);
+
+					bumpSensor.topic = generateTopicListener(bumpSensor.name, bumpSensor.messageType, bumpSensor.scb);
 
 					deferred.resolve(ros);
 				});
