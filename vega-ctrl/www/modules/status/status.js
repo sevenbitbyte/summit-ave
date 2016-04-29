@@ -1,9 +1,9 @@
 (function () {
 	"use strict";
 	angular.module('app')
-		.controller('Status', ['$scope', 'ROSService', Status])
+		.controller('Status', ['$scope', 'ROSSensorsService', Status])
 
-	function Status($scope, ROSService) {
+	function Status($scope, ROSSensorsService) {
 		console.log("StatusCtrl");
 
 		var statusCtrl = this;
@@ -28,12 +28,5 @@
 				label: 'Wifi Networks'
 			}
 		}
-
-		ROSService.start()
-			.then(function (ros) {
-
-				console.log(ros);
-
-			})
 	}
 }())

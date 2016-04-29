@@ -24,6 +24,7 @@
 			}
 
 			audioGoal = ROSService.generateGoal(audioPlayer.action, goal);
+
 			console.log(audioGoal);
 		}
 
@@ -75,7 +76,7 @@
 
 		ROSService.start()
 			.then(function (ros) {
-				audioPlayer.action = ROSService.generateActionClient(serverName, actionName);
+				audioPlayer.action = ROSService.generateActionClient(ros, serverName, actionName);
 			})
 
 

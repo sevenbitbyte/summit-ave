@@ -17,6 +17,9 @@
 			},
 			topics: {
 				label: 'Topics'
+			},
+			params: {
+				label: 'Params'
 			}
 		}
 
@@ -52,6 +55,17 @@
 				}, function (err) {
 					return console.log(err);
 				});
+
+				ros.getParams(function (msg) {
+
+					$scope.$evalAsync(function () {
+						utilityCtrl.cards.params.msg = msg;
+					})
+
+				}, function (err) {
+					return console.log(err);
+				});
+
 			})
 	}
 }())

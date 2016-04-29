@@ -1,13 +1,12 @@
 (function () {
 	"use strict";
 	angular.module('app')
-		.controller('Controller', [Controller])
+		.controller('Controller', ['ROSSensorsService', Controller])
 
-	function Controller() {
+	function Controller(ROSSensorsService) {
 		console.log("ControllerCtrl");
 
 		var controllerCtrl = this;
 
-		controllerCtrl.colors = ["positive", "royal", "balanced"];
 	}
 }())

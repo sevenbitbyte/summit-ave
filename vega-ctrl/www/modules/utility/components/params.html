@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<div class="services">
+  <div class="card">
+    <div class="item item-toggle">
+      {{utilityCtrl.cards.params.msg.length}} Params
+      <label class="toggle toggle-positive">
+        <input type="checkbox" ng-model="showParams">
+        <div class="track">
+          <div class="handle"></div>
+        </div>
+      </label>
+    </div>
+
+    <div class="item-input-inset">
+      <label class="item-input-wrapper">
+        <i class="icon ion-ios-search-strong placeholder-icon"></i>
+        <input type="text" placeholder="Param Search" ng-model="paramQuery">
+      </label>
+      <button class="button button-clear" ng-click="paramQuery = null">
+        <i class="icon ion-ios-close-outline"></i>
+      </button>
+    </div>
+
+    <div ng-if="showParams || paramQuery">
+      <ion-item ng-repeat="p in utilityCtrl.cards.params.msg | filter : paramQuery" class="item-text-wrap">
+        {{p}}
+      </ion-item>
+    </div>
+
+  </div>
+
+</div>

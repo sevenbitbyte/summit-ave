@@ -13,27 +13,9 @@
 
 		var host = (($location.host() === 'localhost') || Utils.isDev()) ? '192.168.1.127' : $location.host();
 
-		var ros;
-
 		var eyePos = {
 			name: '/head/eye_positions',
 			messageType: 'std_msgs/Int8MultiArray'
-		};
-
-		var bumpSensor = {
-			name: '/turtlebot/sensor_state',
-			messageType: 'create_node/TurtlebotSensorState',
-			bumpkey: 'bumps_wheeldrops',
-			scb: function (msg) {
-				// console.log('Received message on ' + bumpSensor.topic.name + ': ', msg[bumpSensor.bumpkey]);
-				var bumpDegree = msg[bumpSensor.bumpkey];
-
-				if(navigator.vibrate && bumpDegree < 4 && bumpDegree > 0) {
-					// vibration API supported
-					console.log("Should be vibrating");
-					navigator.vibrate(bumpDegree);
-				}
-			}
 		};
 
 		/*
@@ -64,7 +46,7 @@
 			return goal;
 		}
 
-		function generateActionClient(serverName, actionName) {
+		function generateActionClient(ros, serverName, actionName) {
 			var action = new ROSLIB.ActionClient({
 				ros: ros,
 				serverName: serverName,
@@ -74,7 +56,7 @@
 			return action;
 		}
 
-		function generateTopicListener(name, messageType, scb) {
+		function generateTopicListener(ros, name, messageType, scb) {
 			var listener = new ROSLIB.Topic({
 				ros: ros,
 				name: name,
@@ -96,7 +78,7 @@
 					function () {
 						console.log("Ros Initialized!");
 
-						ros = new ROSLIB.Ros({
+						var ros = new ROSLIB.Ros({
 							url: 'ws://' + host + ':' + rosPort
 						});
 
@@ -104,9 +86,7 @@
 						ros.on('error', errorHandler);
 						ros.on('close', closeHandler);
 
-						eyePos.topic = generateTopicListener(eyePos.name, eyePos.messageType);
-
-						bumpSensor.topic = generateTopicListener(bumpSensor.name, bumpSensor.messageType, bumpSensor.scb);
+						eyePos.topic = generateTopicListener(ros, eyePos.name, eyePos.messageType);
 
 						console.log(ros);
 
@@ -122,9 +102,6 @@
 			host: host,
 			videoPort: videoPort,
 			start: start,
-			ros: function () {
-				return ros;
-			},
 			eyePos: function () {
 				return eyePos;
 			},
