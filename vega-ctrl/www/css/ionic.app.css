@@ -9129,6 +9129,13 @@ a.button {
   position: relative;
   height: 45vh; }
 
+.controller .head-control .card {
+  height: 36vh; }
+
+.controller .head-control .item {
+  margin-top: 18px;
+  height: 100%; }
+
 .status .card {
   border: ridge gold;
   border-radius: 18px; }
