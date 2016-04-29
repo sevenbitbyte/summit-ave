@@ -8,7 +8,7 @@
 
 		var controlCtrl = this;
 
-		controlCtrl.selected = 'drive';
+		controlCtrl.selected = 'head';
 
 		controlCtrl.type = {
 			drive: {
@@ -60,6 +60,7 @@
 
 				var options = {
 					zone: joyfield,
+					size: 180,
 					color: 'black',
 					mode: 'static',
 					position: {
@@ -70,11 +71,35 @@
 
 				var e = ROSService.eyePos();
 
+				var vc = ROSService.velocityCtrl();
+
 				driveJoystick = nipplejs.create(options);
 
 				driveJoystick.on('move', function (evt, data) {
-					// console.log(data);
+					console.log(data);
 					var angular = Math.cos(data.angle.radian);
+
+					var distance = data.distance / 180;
+
+					if(angular > 0.5 || angular < 0.0){
+						distance = -distance/2.5
+					}
+					else{
+						distance = distance/2
+					}
+
+					var movement = new ROSLIB.Message({
+						linear: {
+							x: distance,
+							y: 0,
+							z: 0
+						},
+						angular: {
+							z: angular,
+							x: 0,
+							y: 0
+						}
+					})
 
 					var eye = new ROSLIB.Message({
 						data: [
@@ -82,6 +107,8 @@
 							Math.round((angular * 7) + 23), 7,
 						]
 					})
+
+					vc.topic.publish(movement);
 
 					e.topic.publish(eye);
 				})

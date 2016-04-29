@@ -18,6 +18,11 @@
 			messageType: 'std_msgs/Int8MultiArray'
 		};
 
+		var velocityCtrl = {
+			name: '/cmd_vel',
+			messageType: 'geometry_msgs/Twist'
+		};
+
 		/*
 		  CDN links:
 		    http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js
@@ -88,6 +93,8 @@
 
 						eyePos.topic = generateTopicListener(ros, eyePos.name, eyePos.messageType);
 
+						velocityCtrl.topic = generateTopicListener(ros, velocityCtrl.name, velocityCtrl.messageType);
+
 						console.log(ros);
 
 						deferred.resolve(ros);
@@ -104,6 +111,9 @@
 			start: start,
 			eyePos: function () {
 				return eyePos;
+			},
+			velocityCtrl: function () {
+				return velocityCtrl;
 			},
 			generateActionClient: generateActionClient,
 			generateTopicListener: generateTopicListener,

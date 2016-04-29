@@ -11,6 +11,9 @@
 
 		var keys = {
 			bump: 'bumps_wheeldrops',
+			temperature: 'temperature',
+			charge: 'charge',
+			capacity: 'capacity'
 		}
 
 		var sensors = {};
@@ -21,30 +24,32 @@
 			if(navigator.vibrate && bumpDegree > 0 && bumpDegree < 4) {
 				// vibration API supported
 				console.log("Should be vibrating");
-				navigator.vibrate(bumpDegree);
+				navigator.vibrate(1);
 			}
 		}
 
-    function getBatteryRate(msg) {
+		function getBatteryPercentage() {
+			return sensors.msg[keys.charge] / sensors.msg[keys.capacity] * 100;
+		}
 
-    }
+		function getTemperature() {
+			return sensors.msg[keys.temperature];
+		}
 
-		function sensorsHandle (msg) {
-
-      vibrationHandle(msg);
-
-      // console.log(msg);
-
-			// console.log('Received Sensor message : ', msg[keys.bump]);
+		function sensorsHandle(msg) {
+			sensors.msg = msg;
+			vibrationHandle(msg);
 		}
 
 		ROSService.start()
 			.then(function (ros) {
 				sensors.listener = ROSService.generateTopicListener(ros, topicName, messageType, sensorsHandle);
-      })
+			})
 
 		return {
-
+			battery: sensors.battery,
+			getBatteryPercentage: getBatteryPercentage,
+			getTemperature: getTemperature
 		};
 	}
 }())

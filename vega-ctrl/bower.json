@@ -9,6 +9,7 @@
     "angular-chart.js": "^0.8.8",
     "roslib": "^0.18.0",
     "virtualjoystick.js": "*",
-    "nipplejs": "^0.6.2"
+    "nipplejs": "^0.6.2",
+    "angular-circular-slider": "^1.0.1"
   }
 }

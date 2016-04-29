@@ -9,7 +9,8 @@
 	"use strict";
 
 	angular.module('app', [
-    'ionic'
+    'ionic',
+		'angular.circular-slider'
   ])
 		.config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider', config])
 		.run(['$ionicPlatform', run])

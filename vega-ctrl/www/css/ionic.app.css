@@ -9090,48 +9090,90 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
-.home .stream {
+.controller .stream {
   height: 36vh; }
 
-.home .stream-frame {
+.controller .stream-frame {
   width: 100%;
   height: 100%; }
 
-.home .item-input {
+.controller .item-input {
   color: white;
   background: white; }
 
-.home .card {
+.controller .card {
   border-radius: 18px;
   border: ridge gold; }
 
-.home .item-group {
+.controller .item-group {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-around;
   background: white; }
 
-.home .item-group-content {
+.controller .item-group-content {
   margin: auto; }
 
-.home .control-scroll {
+.controller .control-scroll {
   height: 49.5vh; }
 
-.home .gantry .gantry-img {
+.controller .gantry .gantry-img {
   max-width: 99px;
   width: 18%; }
 
-.home .gantry .gantry-visual {
+.controller .gantry .gantry-visual {
   background: black;
   max-height: 36vh; }
 
-.home .joystick #joyfield {
+.controller .joystick #joyfield {
   position: relative;
   height: 45vh; }
 
 .status .card {
   border: ridge gold;
   border-radius: 18px; }
+
+.status .battery {
+  /* WebKit */
+  /* Firefox */ }
+  .status .battery meter {
+    /* Reset the default appearance */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 30px;
+    /* For Firefox */
+    background: #EEE;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2) inset;
+    border-radius: 3px; }
+  .status .battery meter::-webkit-meter-bar {
+    background: #EEE;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2) inset;
+    border-radius: 3px; }
+  .status .battery meter::-webkit-meter-even-less-good-value,
+  .status .battery meter::-webkit-meter-optimum-value,
+  .status .battery meter::-webkit-meter-suboptimum-value {
+    border-radius: 3px; }
+  .status .battery meter::-webkit-meter-optimum-value {
+    background: #86CC00; }
+  .status .battery meter::-webkit-meter-suboptimum-value {
+    background: #FFDB1A; }
+  .status .battery meter::-webkit-meter-even-less-good-value {
+    background: #CC4600; }
+  .status .battery meter::-moz-meter-bar {
+    border-radius: 3px; }
+  .status .battery meter:-moz-meter-optimum::-moz-meter-bar {
+    background: #86CC00; }
+  .status .battery meter:-moz-meter-sub-optimum::-moz-meter-bar {
+    background: #FFDB1A; }
+  .status .battery meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+    background: #CC4600; }
+
+hr {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.75), transparent); }
 
 textarea {
   resize: vertical;

@@ -26,8 +26,6 @@
 		ROSService.start()
 			.then(function (ros) {
 
-				console.log(ros);
-
 				ros.getServices(function (msg) {
 
 					$scope.$evalAsync(function () {

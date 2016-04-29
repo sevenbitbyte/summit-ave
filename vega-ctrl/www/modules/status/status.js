@@ -1,9 +1,9 @@
 (function () {
 	"use strict";
 	angular.module('app')
-		.controller('Status', ['$scope', 'ROSSensorsService', Status])
+		.controller('Status', ['$scope', '$interval', 'ROSSensorsService', Status])
 
-	function Status($scope, ROSSensorsService) {
+	function Status($scope, $interval, ROSSensorsService) {
 		console.log("StatusCtrl");
 
 		var statusCtrl = this;
@@ -12,8 +12,9 @@
 			users: {
 				label: 'Connected Users'
 			},
-			level: {
-				label: 'Battery Level'
+			battery: {
+				label: 'Battery Level',
+				percentage : 100,
 			},
 			hd: {
 				label: 'Hard Drives Space'
@@ -26,7 +27,17 @@
 			},
 			wifi: {
 				label: 'Wifi Networks'
+			},
+			temperature : {
+				label: "Temperature"
 			}
 		}
+
+		$interval(function () {
+			statusCtrl.cards.battery.percentage = ROSSensorsService.getBatteryPercentage();
+
+			statusCtrl.cards.temperature.celsius = ROSSensorsService.getTemperature();
+		}, 1800);
+
 	}
 }())

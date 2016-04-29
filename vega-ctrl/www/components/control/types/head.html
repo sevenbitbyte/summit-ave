@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <div class="card">
-  <div class="item item-text-wrap">
-    HEAD
+  <div class="item text-center">
+    <circular-slider class='my-slider' shape='Half Circle' touch="true" animate='false' on-slide='onSlide' min="0" max="180" value="value" radius="90">
+      {{value}} &deg;
+    </circular-slider>
+
   </div>
 </div>
