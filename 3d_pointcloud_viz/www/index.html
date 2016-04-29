@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+
+<!--<script type="text/javascript" src="./lib/three.js/three.min.js"></script>
+<script type="text/javascript" src="./lib/eventemitter2/lib/eventemitter2.js"></script>
+<script type="text/javascript" src="./lib/roslib/build/roslib.min.js"></script>
+<script type="text/javascript" src="./lib/ros3djs/build/ros3d.min.js"></script> -->
+
+<!--<script type="text/javascript" src="./static_lib/three.min.js"></script>
+<script type="text/javascript" src="./static_lib/eventemitter2.min.js"></script>
+<script type="text/javascript" src="./static_lib/roslib.min.js"></script>
+<script type="text/javascript" src="./static_lib/ros3d.min.js"></script>-->
+
+<script type="text/javascript" src="http://cdn.robotwebtools.org/threejs/r61/three.js"></script>
+<script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/0.4.14/eventemitter2.js"></script>
+<script type="text/javascript" src="http://cdn.robotwebtools.org/roslibjs/0.14.0/roslib.js"></script>
+<script type="text/javascript" src="http://cdn.robotwebtools.org/ros3djs/current/ros3d.js"></script>
+
+<script type="text/javascript" type="text/javascript">
+  /**
+   * Setup all visualization elements when the page is loaded.
+   */
+
+  var HOST='192.168.1.115'
+  var WS_PORT=4000
+  var VID_PORT=8080
+
+  function init() {
+    // Connect to ROS.
+    var ros = new ROSLIB.Ros({
+      url : 'ws://' + HOST + ':' + WS_PORT
+    });
+
+    ros.on('error', function(error) {
+      console.error(error);
+    });
+    // Find out exactly when we made a connection.
+    ros.on('connection', function() {
+      console.log('Connection made!');
+
+      // Create the main viewer.
+      var viewer = new ROS3D.Viewer({
+        divID : 'viewer',
+        width : window.innerWidth,
+        height : window.innerHeight,
+        antialias : true
+      });
+
+      viewer.addObject(new ROS3D.Grid({
+      color:'#0181c4',
+      cellSize: 1.0,
+      num_cells: 20
+    }));
+
+
+      // Setup a client to listen to TFs.
+      var tfClient = new ROSLIB.TFClient({
+        ros : ros,
+        angularThres : 0.01,
+        transThres : 0.01,
+        rate : 10.0,
+        fixedFrame : '/base_link'
+      });
+
+      var markerArrClient = new ROS3D.MarkerArrayClient({
+        ros: ros,
+        topic: '/point_downsample/point_downsample/markers',
+        rootObject: viewer.scene,
+        tfClient: tfClient
+      })
+
+      // Setup Kinect DepthCloud stream
+      /*depthCloud = new ROS3D.DepthCloud({
+        url : 'http://' + HOST + ':' + VID_PORT + '/stream_viewer?topic=/depthcloud_encoded',
+        f : 525.0,
+        streamType: 'mjpeg',
+        tfClient : tfClient,
+        rootObject : viewer.scene
+      });
+      depthCloud.startStream();*/
+
+      backgroundCloud = new ROS3D.PointCloud2({
+        ros: ros,
+        tfClient : tfClient,
+        topic: '/point_downsample/point_downsample/points',
+        rootObject : viewer.scene/*,
+        max_pts: 50000*/
+      });
+
+      odom = new ROS3D.Odometry({
+        ros: ros,
+        topic: '/odom',
+        tfClient: tfClient,
+        length: 0.3,
+        headLength: 0.1,
+        headDiameter: 0.05,
+        shaftDiameter: 0.02,
+        rootObject: viewer.scene,
+        keep: 10
+      })
+
+      /*clusterCloud = new ROS3D.PointCloud2({
+        ros: ros,
+        tfClient : tfClient,
+        topic: '/point_downsample/point_downsample/clusters',
+        rootObject : viewer.scene
+      });*/
+
+      /*var pointCloudNode = new ROS3D.SceneNode({
+        frameID : '/camera_link',
+        tfClient : tfClient,
+        object : depthCloud
+      });*/
+      //viewer.scene.add(depthCloud);
+    });
+    ros.on('close', function() {
+      console.log('Connection closed.');
+    });
+
+
+  }
+</script>
+</head>
+
+<body onload="init()">
+  <div id="viewer" width=100% height=100%></div>
+</body>
+</html>
