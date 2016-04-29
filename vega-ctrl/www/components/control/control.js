@@ -8,7 +8,7 @@
 
 		var controlCtrl = this;
 
-		controlCtrl.selected = 'jammer';
+		controlCtrl.selected = 'drive';
 
 		controlCtrl.type = {
 			drive: {
@@ -17,13 +17,13 @@
 			audio: {
 				label: "Audio"
 			},
-			gantry: {
-				label: "Gantry"
-			},
-			head: {
-				label: "Head",
-				rotation: 160
-			},
+			// gantry: {
+			// 	label: "Gantry"
+			// },
+			// head: {
+			// 	label: "Head",
+			// 	rotation: 0
+			// },
 			jammer: {
 				label: "Jammer",
 				elbow: {
@@ -139,7 +139,6 @@
 				ROSService.start()
 					.then(function (ros) {
 						controlCtrl.updateJoysticks();
-
 					})
 			})
 	}

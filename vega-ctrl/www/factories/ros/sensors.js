@@ -29,10 +29,12 @@
 		}
 
 		function getBatteryPercentage() {
+			if (!sensors.msg[keys.charge]) return null;
 			return sensors.msg[keys.charge] / sensors.msg[keys.capacity] * 100;
 		}
 
 		function getTemperature() {
+			if (!sensors.msg[keys.temperature]) return null;
 			return sensors.msg[keys.temperature];
 		}
 
