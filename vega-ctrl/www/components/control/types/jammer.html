@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<div class="jammer">
+  <div class="card">
+    <div class="item">
+      Elbow Rotation
+      <span class="item-note">
+        {{elbowRotation||0/100}} rad
+      </span>
+    </div>
+    <div class="item range range-positive">
+      <input type="range" name="elbow" min="-314" max="314" value="0" ng-model="elbowRotation" ng-change="controlCtrl.turnElbow(elbowRotation)">
+      <button class="button button-clear" ng-click="controlCtrl.turnElbow(0); elbowRotation = 0;">
+        <i class="icon ion-ios-refresh-outline"></i>
+      </button>
+    </div>
+
+    <div class="item">
+      Shoulder Rotation
+      <span class="item-note">
+        {{shoulderRotation||0/100}} rad
+      </span>
+    </div>
+
+    <div class="item range range-positive">
+      <input type="range" name="shoulder" min="-314" max="314" value="0" ng-model="shoulderRotation" ng-change="controlCtrl.turnShoulder(shoulderRotation)">
+
+      <button class="button button-clear" ng-click="controlCtrl.turnShoulder(0); shoulderRotation = 0;">
+        <i class="icon ion-ios-refresh-outline"></i>
+      </button>
+    </div>
+
+  </div>
+</div>

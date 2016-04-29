@@ -1,0 +1,70 @@
+{
+  "Hello-1": {
+    "startms": 30000,
+    "endms": 33000
+  },
+  "Curiousity": {
+    "startms": 0,
+    "endms": 6500
+  },
+  "Impressed": {
+    "startms": 7000,
+    "endms": 10000
+  },
+  "Acknowledged-1": {
+    "startms": 14500,
+    "endms": 15500
+  },
+  "Suprised-1": {
+    "startms": 26500,
+    "endms": 27000
+  },
+  "Suprised-Scared": {
+    "startms": 37600,
+    "endms": 38300
+  },
+  "Suprised-Acknowledge": {
+    "startms": 31000,
+    "endms": 32000
+  },
+  "Warning-Danger-2": {
+    "startms": 101400,
+    "endms": 102700
+  },
+  "Statement-Simple": {
+    "startms": 34000,
+    "endms": 35000
+  },
+  "Statement-Complex": {
+    "startms": 36000,
+    "endms": 37000
+  },
+  "Warning-1": {
+    "startms": 38600,
+    "endms": 40000
+  },
+  "Warning-2": {
+    "startms": 40800,
+    "endms": 42000
+  },
+  "Warning-Urgent": {
+    "startms": 47500,
+    "endms": 48400
+  },
+  "Warning-Scared": {
+    "startms": 63800,
+    "endms": 64300
+  },
+  "Warning-Danger-1": {
+    "startms": 66500,
+    "endms": 67000
+  },
+  "Warning-Danger-2": {
+    "startms": 101400,
+    "endms": 102700
+  },
+  "Terrified/System fault": {
+    "startms": 72000,
+    "endms": 73770
+  }
+}

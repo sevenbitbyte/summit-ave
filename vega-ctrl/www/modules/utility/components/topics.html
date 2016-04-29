@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<div class="services">
+  <div class="card">
+    <div class="item item-toggle">
+      {{utilityCtrl.cards.topics.msg.length}} Topics
+      <label class="toggle toggle-positive">
+        <input type="checkbox" ng-model="showTopics">
+        <div class="track">
+          <div class="handle"></div>
+        </div>
+      </label>
+    </div>
+
+    <div class="item-input-inset">
+      <label class="item-input-wrapper">
+        <i class="icon ion-ios-search-strong placeholder-icon"></i>
+        <input type="text" placeholder="Topic Search" ng-model="topicQuery">
+      </label>
+      <button class="button button-clear" ng-click="topicQuery = null">
+        <i class="icon ion-ios-close-outline"></i>
+      </button>
+    </div>
+
+    <div ng-if="showTopics || topicQuery">
+      <ion-item ng-repeat="t in utilityCtrl.cards.topics.msg | filter : topicQuery" class="item-text-wrap">
+        {{t}}
+      </ion-item>
+    </div>
+
+  </div>
+
+</div>

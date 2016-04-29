@@ -1,0 +1,15 @@
+{
+  "name": "HelloIonic",
+  "private": "true",
+  "devDependencies": {
+    "ionic": "driftyco/ionic-bower#1.1.1"
+  },
+  "dependencies": {
+    "angular-socket-io": "~0.7.0",
+    "angular-chart.js": "^0.8.8",
+    "roslib": "^0.18.0",
+    "virtualjoystick.js": "*",
+    "nipplejs": "^0.6.2",
+    "angular-circular-slider": "^1.0.1"
+  }
+}

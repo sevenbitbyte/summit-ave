@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<ion-view class="status">
+  <div class="bar">
+    <h1 class="title">Vega Utility</h1>
+  </div>
+  <ion-content class="has-header">
+
+    <span ng-repeat="(key, value) in utilityCtrl.cards" ng-include="'modules/utility/components/' + key + '.html'"></span>
+
+  </ion-content>
+</ion-view>

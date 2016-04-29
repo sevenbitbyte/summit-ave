@@ -1,0 +1,9 @@
+<ion-item class="item-text-wrap battery">
+  <label>Battery percentage</label>
+  <span class="item-note">
+     {{statusCtrl.cards.battery.percentage | number : 2}} %
+   </span>
+  <hr>
+  <meter low="20" high="80" optimum="90" max="100"  value="{{statusCtrl.cards.battery.percentage}}">
+  </meter>
+</ion-item>
