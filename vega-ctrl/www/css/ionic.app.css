@@ -9136,6 +9136,22 @@ a.button {
   margin-top: 18px;
   height: 100%; }
 
+.controller .jammer .card {
+  height: 36vh; }
+
+.controller .jammer .row {
+  margin-top: 18px; }
+
+.controller .acs {
+  border-color: black; }
+
+.controller .acs-value {
+  background-color: black;
+  color: white; }
+
+.controller .acs-indicator {
+  background-color: black; }
+
 .status .card {
   border: ridge gold;
   border-radius: 18px; }

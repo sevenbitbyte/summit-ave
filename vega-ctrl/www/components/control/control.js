@@ -1,14 +1,14 @@
 (function () {
 	"use strict";
 	angular.module('app')
-		.controller('Control', ['JoystickService', 'ROSService', 'ROSAudioService', '$timeout', Control])
+		.controller('Control', ['JoystickService', 'ROSService', 'ROSAudioService', 'ROSMotorsService', '$timeout', Control])
 
-	function Control(JoystickService, ROSService, ROSAudioService, $timeout) {
+	function Control(JoystickService, ROSService, ROSAudioService, ROSMotorsService, $timeout) {
 		console.log("ControlCtrl");
 
 		var controlCtrl = this;
 
-		controlCtrl.selected = 'head';
+		controlCtrl.selected = 'jammer';
 
 		controlCtrl.type = {
 			drive: {
@@ -21,12 +21,28 @@
 				label: "Gantry"
 			},
 			head: {
-				label: "Head"
+				label: "Head",
+				rotation: 160
 			},
 			jammer: {
-				label: "Jammer"
+				label: "Jammer",
+				elbow: {
+					rotation: 0
+				},
+				shoulder: {
+					rotation: 0
+				}
 			}
 		}
+
+		controlCtrl.turnElbow = function (r100) {
+			ROSMotorsService.turnElbow(r100/100);
+		}
+
+		controlCtrl.turnShoulder = function (r100) {
+			ROSMotorsService.turnShoulder(r100/100);
+		}
+
 
 		ROSAudioService.getAvailableClips()
 			.then(
@@ -76,16 +92,15 @@
 				driveJoystick = nipplejs.create(options);
 
 				driveJoystick.on('move', function (evt, data) {
-					console.log(data);
+					// console.log(data);
 					var angular = Math.cos(data.angle.radian);
 
 					var distance = data.distance / 180;
 
-					if(angular > 0.5 || angular < 0.0){
-						distance = -distance/2.5
-					}
-					else{
-						distance = distance/2
+					if(angular > 0.5 || angular < 0.0) {
+						distance = -distance / 2.5
+					} else {
+						distance = distance / 2
 					}
 
 					var movement = new ROSLIB.Message({
@@ -124,8 +139,8 @@
 				ROSService.start()
 					.then(function (ros) {
 						controlCtrl.updateJoysticks();
+
 					})
 			})
-
 	}
 }())

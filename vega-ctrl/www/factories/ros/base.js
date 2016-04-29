@@ -7,19 +7,19 @@
 	function ROSService(Utils, $location, $q) {
 		console.log('ROSService');
 
-		var videoPort = 8000;
+		var videoPort = 8080;
 
 		var rosPort = 4000;
 
-		var host = (($location.host() === 'localhost') || Utils.isDev()) ? '192.168.1.127' : $location.host();
+		var host = (($location.host() === 'localhost') || Utils.isDev()) ? '192.168.1.104' : $location.host();
 
 		var eyePos = {
-			name: '/head/eye_positions',
+			topic: '/head/eye_positions',
 			messageType: 'std_msgs/Int8MultiArray'
 		};
 
 		var velocityCtrl = {
-			name: '/cmd_vel',
+			topic: '/cmd_vel',
 			messageType: 'geometry_msgs/Twist'
 		};
 
@@ -61,14 +61,12 @@
 			return action;
 		}
 
-		function generateTopicListener(ros, name, messageType, scb) {
+		function generateTopic(ros, topic, messageType) {
 			var listener = new ROSLIB.Topic({
 				ros: ros,
-				name: name,
+				name: topic,
 				messageType: messageType
 			});
-
-			if(scb) listener.subscribe(scb)
 
 			return listener;
 		}
@@ -91,9 +89,9 @@
 						ros.on('error', errorHandler);
 						ros.on('close', closeHandler);
 
-						eyePos.topic = generateTopicListener(ros, eyePos.name, eyePos.messageType);
+						eyePos.topic = generateTopic(ros, eyePos.topic, eyePos.messageType);
 
-						velocityCtrl.topic = generateTopicListener(ros, velocityCtrl.name, velocityCtrl.messageType);
+						velocityCtrl.topic = generateTopic(ros, velocityCtrl.topic, velocityCtrl.messageType);
 
 						console.log(ros);
 
@@ -116,7 +114,7 @@
 				return velocityCtrl;
 			},
 			generateActionClient: generateActionClient,
-			generateTopicListener: generateTopicListener,
+			generateTopic: generateTopic,
 			generateGoal: generateGoal
 		};
 	}

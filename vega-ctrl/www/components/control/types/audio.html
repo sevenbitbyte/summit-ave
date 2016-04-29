@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<div class="audio">
-  <div class="item-group card">
-    <div class="item item-group-content text-center button button-dark button-clear" ng-repeat="(key, value) in controlCtrl.soundclips" ng-click="controlCtrl.playClip(value)">
-      {{key}}
+<ion-scroll direction="y" class="control-scroll">
+  <div class="audio">
+    <div class="item-group card">
+      <div class="item item-group-content text-center button button-dark button-clear" ng-repeat="(key, value) in controlCtrl.soundclips" ng-click="controlCtrl.playClip(value)">
+        {{key}}
+      </div>
     </div>
   </div>
-</div>
+</ion-scroll>

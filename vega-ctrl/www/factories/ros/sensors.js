@@ -43,7 +43,8 @@
 
 		ROSService.start()
 			.then(function (ros) {
-				sensors.listener = ROSService.generateTopicListener(ros, topicName, messageType, sensorsHandle);
+				sensors.topic = ROSService.generateTopic(ros, topicName, messageType);
+				sensors.topic.subscribe(sensorsHandle);
 			})
 
 		return {
