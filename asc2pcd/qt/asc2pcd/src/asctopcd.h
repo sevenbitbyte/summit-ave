@@ -15,6 +15,9 @@ class AscToPcd : public QObject
 
   signals:
 
+  protected:
+    pcl::PointCloud<pcl::PointXYZ>::Ptr downsample(float leafSize, QFileInfo info, pcl::PointCloud<pcl::PointXYZ>::Ptr input);
+
   public slots:
     void writePCD(ArcAsciiData* data);
     void reportError(QString error);
@@ -25,6 +28,7 @@ class AscToPcd : public QObject
 
   private:
     ArcAsciiParser* parser;
+    QThread* parserThread;
 };
 
 #endif // ASCTOPCD_H

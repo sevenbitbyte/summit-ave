@@ -37,7 +37,8 @@ ArcAsciiData::ArcAsciiData(QObject* parent) :
     QObject(parent)
 {
   this->file = NULL;
-  this->cloud.is_dense = true;
+  this->cloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
+  this->cloud->is_dense = true;
 }
 
 
@@ -82,22 +83,23 @@ void ArcAsciiParser::startParsing(){
   }
 
   while( !_filesToParse.empty() && !_stopped ){
-      QFileInfo info = _filesToParse.front();
-      _filesToParse.pop_front();
+    QFileInfo info = _filesToParse.front();
+    _filesToParse.pop_front();
 
-      //emit parsingFile(info.filePath());
-      ArcAsciiData* data = loadData(info);
+    //emit parsingFile(info.filePath());
+    ArcAsciiData* data = loadData(info);
 
-      if(data == NULL){
-          emit parseError(info.filePath());
-          continue;
-      }
+    if(data == NULL){
+      emit parseError(info.filePath());
+      continue;
+    }
 
-      bytesRead += info.size();
+    bytesRead += info.size();
 
-      qreal percentProgress = bytesRead / bytesToRead;
-      emit totalProgress(percentProgress);
-      emit dataReady(data);
+    qreal percentProgress = bytesRead / bytesToRead;
+    emit totalProgress(percentProgress);
+    emit dataReady(data);
+    qDebug() << "dataReady " << data->info.fileName();
   }
 
   _parsing = false;
@@ -122,7 +124,7 @@ ArcAsciiData* ArcAsciiParser::loadData(QFileInfo file){
         return NULL;
     }
 
-    if(data->cloud.points.empty()){
+    if(data->cloud->points.empty()){
         if(!loadPointCloud(data)){
             qWarning() << "Failed to load elevation ["<<file.filePath()<<"]";
             delete data;
@@ -193,6 +195,7 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
     //data->elevation.resize(data->header.height * data->header.width);
 
     emit parsingFile(data->file->fileName());
+    qDebug() << "Parsing pointCloud" << data->file->fileName();
 
     while( !data->file->atEnd() && !_stopped){
 
@@ -223,7 +226,7 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
                     LLA lla = data->header.rowColToLLA(fileRow-6, col);
                     lla.altitude = elevation*5;
                     Point3D pt(lla);
-                    data->cloud.push_back(pcl::PointXYZ(pt.x, pt.y, pt.z));
+                    data->cloud->push_back(pcl::PointXYZ(pt.x, pt.y, pt.z));
                 }
 
                 elevationIdx++;
