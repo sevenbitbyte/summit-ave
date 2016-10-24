@@ -30,7 +30,7 @@ Point3D::Point3D(LLA latLong){
 }
 
 LLA ArcAsciiHeader::rowColToLLA(int row, int col){
-  return LLA((row*this->cellSize) + this->yCorner, (col*this->cellSize)+this->xCorner);
+  return LLA((((this->height-1)-row)*this->cellSize) + this->yCorner, (col*this->cellSize)+this->xCorner);
 }
 
 ArcAsciiData::ArcAsciiData(QObject* parent) :
@@ -221,7 +221,7 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
 
                 if(elevation != data->header.noData){
                     LLA lla = data->header.rowColToLLA(fileRow-6, col);
-                    lla.altitude = -elevation*3;
+                    lla.altitude = elevation*5;
                     Point3D pt(lla);
                     data->cloud.push_back(pcl::PointXYZ(pt.x, pt.y, pt.z));
                 }
