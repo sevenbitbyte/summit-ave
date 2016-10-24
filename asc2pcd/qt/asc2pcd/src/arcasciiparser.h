@@ -54,6 +54,8 @@ class ArcAsciiParser : public QObject
         bool queueFile(QString file);
         bool parsing();
 
+        QList<QFileInfo> _filesToParse;
+
     protected:
         /**
          * @brief   Parses all file data
@@ -81,7 +83,7 @@ class ArcAsciiParser : public QObject
         bool _stopped;
         bool _parsing;
         bool _loadElevation;
-        QList<QFileInfo> _filesToParse;
+
 };
 
 #endif // ARCASCIIPARSER_H

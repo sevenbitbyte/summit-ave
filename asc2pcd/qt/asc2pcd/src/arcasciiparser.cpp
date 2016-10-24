@@ -229,12 +229,13 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
                 elevationIdx++;
                 lineIdx += (sep - lineIdx) + 1;
 
-                //Emit progress
-                if(fileRow % 20 == 0){
-                    double progressPercent = ((qreal)data->file->pos()) / ((qreal) data->info.size());
-                    emit currentFileProgress(progressPercent, data);
-                }
                 col++;
+            }
+
+            //Emit progress
+            if(fileRow % 20 == 0){
+                double progressPercent = ((qreal)data->file->pos()) / ((qreal) data->info.size());
+                emit currentFileProgress(progressPercent, data);
             }
         }
         fileRow++;
