@@ -8,6 +8,7 @@ AscToPcd::AscToPcd(QCoreApplication* parent) : QObject(parent)
 {
   qDebug() << parent->arguments();
 
+  mergedCloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
   parserThread = new QThread();
   parser = new ArcAsciiParser();
   parser->moveToThread(parserThread);
@@ -19,7 +20,7 @@ AscToPcd::AscToPcd(QCoreApplication* parent) : QObject(parent)
 
   qDebug() << parser->_filesToParse.size();
   connect(parser, SIGNAL(finished()), this, SLOT(parserDone()));
-  connect(parser, SIGNAL(finished()), parent, SLOT(quit()));
+  connect(this, SIGNAL(done()), parent, SLOT(quit()));
   connect(parser, SIGNAL(dataReady(ArcAsciiData*)), this, SLOT(writePCD(ArcAsciiData*)));
   connect(parser, SIGNAL(parseError(QString)), this, SLOT(reportError(QString)));
   connect(parser, SIGNAL(parsingFile(QString)), this, SLOT(reportParsingStart(QString)));
@@ -39,6 +40,12 @@ AscToPcd::~AscToPcd(){
 
 void AscToPcd::parserDone(){
   qDebug() << "Parsing finished";
+
+  qDebug() << "Writing: merged.pcd with " << mergedCloud->points.size() << " points";
+  pcl::io::savePCDFileBinary("merged.pcd", *mergedCloud);
+  qDebug() << "Wrote: merged.pcd";
+
+  emit done();
 }
 
 void AscToPcd::writePCD(ArcAsciiData* data){
@@ -57,6 +64,10 @@ void AscToPcd::writePCD(ArcAsciiData* data){
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1000 = downsample(1000.0f, data->info, data->cloud);
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud5000 = downsample(5000.0f, data->info, cloud1000);
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud10000 = downsample(10000.0f, data->info, cloud5000);
+
+  for(int i=0; i<cloud1000->points.size(); i++){
+    mergedCloud->push_back( cloud1000->points[i] );
+  }
 
   delete data;
 }

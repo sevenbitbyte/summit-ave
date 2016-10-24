@@ -236,7 +236,7 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
             }
 
             //Emit progress
-            if(fileRow % 20 == 0){
+            if(fileRow % 600 == 0){
                 double progressPercent = ((qreal)data->file->pos()) / ((qreal) data->info.size());
                 emit currentFileProgress(progressPercent, data);
             }

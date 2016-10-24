@@ -14,6 +14,7 @@ class AscToPcd : public QObject
     ~AscToPcd();
 
   signals:
+    void done();
 
   protected:
     pcl::PointCloud<pcl::PointXYZ>::Ptr downsample(float leafSize, QFileInfo info, pcl::PointCloud<pcl::PointXYZ>::Ptr input);
@@ -29,6 +30,7 @@ class AscToPcd : public QObject
   private:
     ArcAsciiParser* parser;
     QThread* parserThread;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr mergedCloud;
 };
 
 #endif // ASCTOPCD_H
