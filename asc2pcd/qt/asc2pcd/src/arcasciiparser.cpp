@@ -42,11 +42,12 @@ ArcAsciiData::ArcAsciiData(QObject* parent) :
 }
 
 
-ArcAsciiParser::ArcAsciiParser(QObject* parent) :
+ArcAsciiParser::ArcAsciiParser(int elevCoef, QObject* parent) :
     QObject(parent)
 {
   _stopped = true;
   _parsing = false;
+  _elevCoef = elevCoef;
 }
 
 
@@ -69,6 +70,10 @@ void ArcAsciiParser::stopParsing(){
 
 bool ArcAsciiParser::parsing(){
     return _parsing;
+}
+
+int ArcAsciiParser::elevationCoefficient(){
+  return _elevCoef;
 }
 
 void ArcAsciiParser::startParsing(){
@@ -200,6 +205,8 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
     QString pcdPath = data->info.path();
     pcdPath.append("/");
     pcdPath.append(data->info.baseName());
+    pcdPath.append("_x");
+    pcdPath.append(QString::number(this->_elevCoef));
     pcdPath.append(".pcd");
     QFileInfo pcdInfo(pcdPath);
 
@@ -239,7 +246,7 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
 
                 if(elevation != data->header.noData){
                     LLA lla = data->header.rowColToLLA(fileRow-6, col);
-                    lla.altitude = elevation*5;
+                    lla.altitude = elevation*this->_elevCoef;
                     Point3D pt(lla);
                     data->cloud->push_back(pcl::PointXYZ(pt.x, pt.y, pt.z));
                 }

@@ -8,9 +8,11 @@ AscToPcd::AscToPcd(QCoreApplication* parent) : QObject(parent)
 {
   qDebug() << parent->arguments();
 
-  mergedCloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
+  mergedCloud5k = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
+  mergedCloud10k = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
+  mergedCloud20k = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
   parserThread = new QThread();
-  parser = new ArcAsciiParser();
+  parser = new ArcAsciiParser(40);
   parser->moveToThread(parserThread);
 
 
@@ -41,9 +43,15 @@ AscToPcd::~AscToPcd(){
 void AscToPcd::parserDone(){
   qDebug() << "Parsing finished";
 
-  qDebug() << "Writing: merged.pcd with " << mergedCloud->points.size() << " points";
-  pcl::io::savePCDFileBinary("merged.pcd", *mergedCloud);
-  qDebug() << "Wrote: merged.pcd";
+  qDebug() << "Writing: merged20k.pcd with " << mergedCloud20k->points.size() << " points";
+  pcl::io::savePCDFileBinary("merged20k.pcd", *mergedCloud20k);
+
+  qDebug() << "Writing: merged10k.pcd with " << mergedCloud10k->points.size() << " points";
+  pcl::io::savePCDFileBinary("merged10k.pcd", *mergedCloud10k);
+
+  /*qDebug() << "Writing: merged5k.pcd with " << mergedCloud5k->points.size() << " points";
+  pcl::io::savePCDFileBinary("merged5k.pcd", *mergedCloud5k);*/
+  qDebug() << "Wrote: merged PCDs";
 
   emit done();
 }
@@ -54,6 +62,8 @@ void AscToPcd::writePCD(ArcAsciiData* data){
   QString pcdPath = data->info.path();
   pcdPath.append("/");
   pcdPath.append(data->info.baseName());
+  pcdPath.append("_x");
+  pcdPath.append(QString::number(parser->elevationCoefficient()));
   pcdPath.append(".pcd");
   QFileInfo pcdInfo(pcdPath);
 
@@ -68,27 +78,36 @@ void AscToPcd::writePCD(ArcAsciiData* data){
   }
 
   qDebug() << "Creating pyramids of " << pcdPath << "...";
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1000 = downsampleOrLoad(1000.0f, data->info, data->cloud);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud5000 = downsampleOrLoad(5000.0f, data->info, cloud1000);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud10000 = downsampleOrLoad(10000.0f, data->info, cloud5000);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud50000 = downsampleOrLoad(50000.0f, data->info, cloud10000);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud100000 = downsampleOrLoad(100000.0f, data->info, cloud10000);
+  //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1000 = downsampleOrLoad(1000.0f, data->info, data->cloud, 500);
+  //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud5000 = downsampleOrLoad(5000.0f, data->info, data->cloud, 2000.0f);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud10000 = downsampleOrLoad(10000.0f, data->info, data->cloud, 3000.0f);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud20000 = downsampleOrLoad(20000.0f, data->info, data->cloud, 3500.0f);
+  //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud100000 = downsampleOrLoad(100000.0f, data->info, data->cloud, 5000.0f);
 
-  for(int i=0; i<cloud50000->points.size(); i++){
-    mergedCloud->push_back( cloud50000->points[i] );
+  for(int i=0; i<cloud10000->points.size(); i++){
+    mergedCloud10k->push_back( cloud10000->points[i] );
   }
+
+  for(int i=0; i<cloud20000->points.size(); i++){
+    mergedCloud20k->push_back( cloud20000->points[i] );
+  }/*
+
+  for(int i=0; i<cloud100000->points.size(); i++){
+    mergedCloud100k->push_back( cloud100000->points[i] );
+  }*/
 
   delete data;
 }
 
-pcl::PointCloud<pcl::PointXYZ>::Ptr AscToPcd::downsampleOrLoad(float leafSize, QFileInfo info, pcl::PointCloud<pcl::PointXYZ>::Ptr input){
+pcl::PointCloud<pcl::PointXYZ>::Ptr AscToPcd::downsampleOrLoad(float leafSize, QFileInfo info, pcl::PointCloud<pcl::PointXYZ>::Ptr input, float leafSizeV){
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr downsampledCloudPtr(new pcl::PointCloud<pcl::PointXYZ>);
 
-  QString pcdDownsampledPath = QString("%1/%2_voxel_%3.pcd")
+  QString pcdDownsampledPath = QString("%1/%2_voxel_%3_x%4.pcd")
       .arg(info.path())
       .arg(info.baseName())
-      .arg(leafSize);
+      .arg(leafSize)
+      .arg(parser->elevationCoefficient());
   QFileInfo pcdInfo(pcdDownsampledPath);
 
   if(pcdInfo.exists()){
@@ -102,7 +121,7 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr AscToPcd::downsampleOrLoad(float leafSize, Q
 
   pcl::VoxelGrid<pcl::PointXYZ> downsample;
   downsample.setInputCloud(input);
-  downsample.setLeafSize(leafSize, leafSize, 90.0f);
+  downsample.setLeafSize(leafSize, leafSize, leafSizeV);
   downsample.filter(*downsampledCloudPtr);
 
   qDebug() << "Downsample complete with " << downsampledCloudPtr->points.size() << " points";
