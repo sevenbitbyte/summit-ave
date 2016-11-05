@@ -42,7 +42,7 @@ class ArcAsciiData : public QObject {
     ArcAsciiHeader header;
     QFile* file;
     QFileInfo info;
-    pcl::PointCloud<pcl::PointXYZ> cloud;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;
 };
 
 class ArcAsciiParser : public QObject

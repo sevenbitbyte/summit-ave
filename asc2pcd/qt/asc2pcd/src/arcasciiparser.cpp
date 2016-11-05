@@ -30,14 +30,15 @@ Point3D::Point3D(LLA latLong){
 }
 
 LLA ArcAsciiHeader::rowColToLLA(int row, int col){
-  return LLA((row*this->cellSize) + this->yCorner, (col*this->cellSize)+this->xCorner);
+  return LLA((((this->height-1)-row)*this->cellSize) + this->yCorner, (col*this->cellSize)+this->xCorner);
 }
 
 ArcAsciiData::ArcAsciiData(QObject* parent) :
     QObject(parent)
 {
   this->file = NULL;
-  this->cloud.is_dense = true;
+  this->cloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
+  this->cloud->is_dense = true;
 }
 
 
@@ -82,22 +83,23 @@ void ArcAsciiParser::startParsing(){
   }
 
   while( !_filesToParse.empty() && !_stopped ){
-      QFileInfo info = _filesToParse.front();
-      _filesToParse.pop_front();
+    QFileInfo info = _filesToParse.front();
+    _filesToParse.pop_front();
 
-      //emit parsingFile(info.filePath());
-      ArcAsciiData* data = loadData(info);
+    //emit parsingFile(info.filePath());
+    ArcAsciiData* data = loadData(info);
 
-      if(data == NULL){
-          emit parseError(info.filePath());
-          continue;
-      }
+    if(data == NULL){
+      emit parseError(info.filePath());
+      continue;
+    }
 
-      bytesRead += info.size();
+    bytesRead += info.size();
 
-      qreal percentProgress = bytesRead / bytesToRead;
-      emit totalProgress(percentProgress);
-      emit dataReady(data);
+    qreal percentProgress = bytesRead / bytesToRead;
+    emit totalProgress(percentProgress);
+    emit dataReady(data);
+    qDebug() << "dataReady " << data->info.fileName();
   }
 
   _parsing = false;
@@ -122,7 +124,7 @@ ArcAsciiData* ArcAsciiParser::loadData(QFileInfo file){
         return NULL;
     }
 
-    if(data->cloud.points.empty()){
+    if(data->cloud->points.empty()){
         if(!loadPointCloud(data)){
             qWarning() << "Failed to load elevation ["<<file.filePath()<<"]";
             delete data;
@@ -193,6 +195,23 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
     //data->elevation.resize(data->header.height * data->header.width);
 
     emit parsingFile(data->file->fileName());
+    qDebug() << "Parsing pointCloud" << data->file->fileName();
+
+    QString pcdPath = data->info.path();
+    pcdPath.append("/");
+    pcdPath.append(data->info.baseName());
+    pcdPath.append(".pcd");
+    QFileInfo pcdInfo(pcdPath);
+
+    if(pcdInfo.exists()){
+      //Load existing PCD
+      if(pcl::io::loadPCDFile<pcl::PointXYZ> (pcdPath.toAscii().data(), *data->cloud) != -1 && data->cloud->size() > 0){
+        //Loaded existing PCD
+        qDebug() << "Loaded existing pointCloud" << pcdInfo.fileName();
+        emit currentFileProgress(1.0, data);
+        return true;
+      }
+    }
 
     while( !data->file->atEnd() && !_stopped){
 
@@ -205,7 +224,6 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
                 qCritical() << "Expect 2 tokens but found " << tokens.size() << " on line " << lineCount;
                 return false;
             }
-
         }
         else{
             int elevationIdx = (fileRow - 6) * data->header.width;
@@ -221,9 +239,9 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
 
                 if(elevation != data->header.noData){
                     LLA lla = data->header.rowColToLLA(fileRow-6, col);
-                    lla.altitude = -elevation*3;
+                    lla.altitude = elevation*5;
                     Point3D pt(lla);
-                    data->cloud.push_back(pcl::PointXYZ(pt.x, pt.y, pt.z));
+                    data->cloud->push_back(pcl::PointXYZ(pt.x, pt.y, pt.z));
                 }
 
                 elevationIdx++;
@@ -233,7 +251,7 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
             }
 
             //Emit progress
-            if(fileRow % 20 == 0){
+            if(fileRow % 600 == 0){
                 double progressPercent = ((qreal)data->file->pos()) / ((qreal) data->info.size());
                 emit currentFileProgress(progressPercent, data);
             }
