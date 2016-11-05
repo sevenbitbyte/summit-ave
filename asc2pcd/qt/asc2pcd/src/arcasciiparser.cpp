@@ -197,6 +197,22 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
     emit parsingFile(data->file->fileName());
     qDebug() << "Parsing pointCloud" << data->file->fileName();
 
+    QString pcdPath = data->info.path();
+    pcdPath.append("/");
+    pcdPath.append(data->info.baseName());
+    pcdPath.append(".pcd");
+    QFileInfo pcdInfo(pcdPath);
+
+    if(pcdInfo.exists()){
+      //Load existing PCD
+      if(pcl::io::loadPCDFile<pcl::PointXYZ> (pcdPath.toAscii().data(), *data->cloud) != -1 && data->cloud->size() > 0){
+        //Loaded existing PCD
+        qDebug() << "Loaded existing pointCloud" << pcdInfo.fileName();
+        emit currentFileProgress(1.0, data);
+        return true;
+      }
+    }
+
     while( !data->file->atEnd() && !_stopped){
 
         QString lineData = data->file->readLine();
@@ -208,7 +224,6 @@ bool ArcAsciiParser::loadPointCloud(ArcAsciiData* data){
                 qCritical() << "Expect 2 tokens but found " << tokens.size() << " on line " << lineCount;
                 return false;
             }
-
         }
         else{
             int elevationIdx = (fileRow - 6) * data->header.width;

@@ -17,7 +17,7 @@ class AscToPcd : public QObject
     void done();
 
   protected:
-    pcl::PointCloud<pcl::PointXYZ>::Ptr downsample(float leafSize, QFileInfo info, pcl::PointCloud<pcl::PointXYZ>::Ptr input);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr downsampleOrLoad(float leafSize, QFileInfo info, pcl::PointCloud<pcl::PointXYZ>::Ptr input);
 
   public slots:
     void writePCD(ArcAsciiData* data);

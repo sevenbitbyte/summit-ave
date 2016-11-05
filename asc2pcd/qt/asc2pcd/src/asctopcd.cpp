@@ -55,34 +55,55 @@ void AscToPcd::writePCD(ArcAsciiData* data){
   pcdPath.append("/");
   pcdPath.append(data->info.baseName());
   pcdPath.append(".pcd");
+  QFileInfo pcdInfo(pcdPath);
 
-  qDebug() << "Writing:" << pcdPath;
-  pcl::io::savePCDFileBinary(pcdPath.toAscii().data(), *data->cloud);
-  qDebug() << "Wrote:" << pcdPath;
+  if(pcdInfo.exists()){
+    //Load existing PCD
+    qDebug() << "Not writing: " << pcdPath << " already exists";
+  }
+  else{
+    qDebug() << "Writing:" << pcdPath;
+    pcl::io::savePCDFileBinary(pcdPath.toAscii().data(), *data->cloud);
+    qDebug() << "Wrote:" << pcdPath;
+  }
 
   qDebug() << "Creating pyramids of " << pcdPath << "...";
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1000 = downsample(1000.0f, data->info, data->cloud);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud5000 = downsample(5000.0f, data->info, cloud1000);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud10000 = downsample(10000.0f, data->info, cloud5000);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1000 = downsampleOrLoad(1000.0f, data->info, data->cloud);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud5000 = downsampleOrLoad(5000.0f, data->info, cloud1000);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud10000 = downsampleOrLoad(10000.0f, data->info, cloud5000);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud50000 = downsampleOrLoad(50000.0f, data->info, cloud10000);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud100000 = downsampleOrLoad(100000.0f, data->info, cloud10000);
 
-  for(int i=0; i<cloud1000->points.size(); i++){
-    mergedCloud->push_back( cloud1000->points[i] );
+  for(int i=0; i<cloud50000->points.size(); i++){
+    mergedCloud->push_back( cloud50000->points[i] );
   }
 
   delete data;
 }
 
-pcl::PointCloud<pcl::PointXYZ>::Ptr AscToPcd::downsample(float leafSize, QFileInfo info, pcl::PointCloud<pcl::PointXYZ>::Ptr input){
+pcl::PointCloud<pcl::PointXYZ>::Ptr AscToPcd::downsampleOrLoad(float leafSize, QFileInfo info, pcl::PointCloud<pcl::PointXYZ>::Ptr input){
+
   pcl::PointCloud<pcl::PointXYZ>::Ptr downsampledCloudPtr(new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::VoxelGrid<pcl::PointXYZ> downsample;
-  downsample.setInputCloud(input);
-  downsample.setLeafSize(leafSize, leafSize, 90.0f);
-  downsample.filter(*downsampledCloudPtr);
 
   QString pcdDownsampledPath = QString("%1/%2_voxel_%3.pcd")
       .arg(info.path())
       .arg(info.baseName())
       .arg(leafSize);
+  QFileInfo pcdInfo(pcdDownsampledPath);
+
+  if(pcdInfo.exists()){
+    //Load existing PCD
+    if(pcl::io::loadPCDFile<pcl::PointXYZ> (pcdDownsampledPath.toAscii().data(), *downsampledCloudPtr) != -1 && downsampledCloudPtr->size() > 0){
+      //Loaded existing PCD
+      qDebug() << "Loaded existing pointCloud" << pcdInfo.fileName();
+      return downsampledCloudPtr;
+    }
+  }
+
+  pcl::VoxelGrid<pcl::PointXYZ> downsample;
+  downsample.setInputCloud(input);
+  downsample.setLeafSize(leafSize, leafSize, 90.0f);
+  downsample.filter(*downsampledCloudPtr);
 
   qDebug() << "Downsample complete with " << downsampledCloudPtr->points.size() << " points";
   qDebug() << "Writing:" << pcdDownsampledPath;
