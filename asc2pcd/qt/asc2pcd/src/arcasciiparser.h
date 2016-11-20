@@ -49,10 +49,11 @@ class ArcAsciiParser : public QObject
 {
     Q_OBJECT
     public:
-        explicit ArcAsciiParser(QObject* parent = 0);
+        explicit ArcAsciiParser(int elevCoef=5, QObject* parent = 0);
 
         bool queueFile(QString file);
         bool parsing();
+        int elevationCoefficient();
 
         QList<QFileInfo> _filesToParse;
 
@@ -83,6 +84,7 @@ class ArcAsciiParser : public QObject
         bool _stopped;
         bool _parsing;
         bool _loadElevation;
+        int _elevCoef;
 
 };
 
