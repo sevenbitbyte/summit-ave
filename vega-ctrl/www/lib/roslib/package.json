@@ -37,7 +37,7 @@
     "eventemitter2": "^0.4.13",
     "object-assign": "^4.0.1",
     "pngparse": "^2.0.1",
-    "ws": "^0.8.0",
+    "ws": "^7.2.3",
     "xmldom": "^0.1.19"
   },
   "directories": {
