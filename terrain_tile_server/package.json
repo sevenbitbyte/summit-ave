@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "async": "^1.4.2",
-    "canvas": "1.2.7",
+    "canvas": "2.6.1",
     "decompress": "^2.3.0",
     "good": "^6.3.0",
     "good-console": "^5.0.2",
